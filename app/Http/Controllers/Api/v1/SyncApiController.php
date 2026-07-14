@@ -97,12 +97,28 @@ class SyncApiController extends Controller
                     $mappedData['nom_recensement'] = $recData['nom_recensement'] ?? 'SOC-MOB-' . uniqid();
                     $mappedData['statut'] = \App\Enums\RecensementStatut::SOUMIS;
                     
+                    $mappedData['gps_latitude'] = $recData['gpsLatitude'] ?? $recData['gps_latitude'] ?? null;
+                    $mappedData['gps_longitude'] = $recData['gpsLongitude'] ?? $recData['gps_longitude'] ?? null;
+
                     // Fallback d'assignation géographique
                     if (empty($mappedData['quartier_id']) || empty($mappedData['carre_id'])) {
                         $defaultCarre = \App\Models\Parameters\Carre::first();
                         if ($defaultCarre) {
                             $mappedData['carre_id'] = $defaultCarre->id;
                             $mappedData['quartier_id'] = $defaultCarre->quartier_id;
+                        }
+                    }
+
+                    // Check duplicate: Règle 6 : Détection de doublons (même téléphone principal + même adresse)
+                    $tel = $mappedData['chefTelephone'] ?? null;
+                    $adr = $mappedData['adresse'] ?? null;
+                    if ($tel && $adr) {
+                        $exists = Recensement::where('chef_telephone', $tel)
+                            ->where('adresse', $adr)
+                            ->where('id', '!=', $id)
+                            ->exists();
+                        if ($exists) {
+                            throw new Exception("Un ménage avec le même numéro de téléphone et la même adresse existe déjà.");
                         }
                     }
 
@@ -173,6 +189,21 @@ class SyncApiController extends Controller
 
                     if (auth()->check() && auth()->user()->agent) {
                         $maison->enqueteur_id = auth()->user()->agent->id;
+                    }
+
+                    // Check duplicate: Règle 2 : Détection de doublons (même adresse + même numéro de porte + même carré)
+                    $porte = $mappedData['numero_porte'] ?? null;
+                    $adr = $mappedData['adresse'] ?? null;
+                    $carreId = $mappedData['carre_id'] ?? null;
+                    if ($adr && $porte && $carreId) {
+                        $exists = Maison::where('adresse', $adr)
+                            ->where('numero_porte', $porte)
+                            ->where('carre_id', $carreId)
+                            ->where('id', '!=', $id)
+                            ->exists();
+                        if ($exists) {
+                            throw new Exception("Une habitation avec la même adresse, le même numéro de porte et dans le même carré existe déjà.");
+                        }
                     }
 
                     $maison->save();
@@ -259,11 +290,43 @@ class SyncApiController extends Controller
                     
                     $mappedData['statut'] = \App\Enums\OperateurStatut::SOUMIS;
 
+                    $mappedData['carre_id'] = $opData['carreId'] ?? $opData['carre_id'] ?? null;
+                    $mappedData['quartier_id'] = $opData['quartierId'] ?? $opData['quartier_id'] ?? null;
+                    $mappedData['gps_latitude'] = $opData['gpsLatitude'] ?? $opData['gps_latitude'] ?? null;
+                    $mappedData['gps_longitude'] = $opData['gpsLongitude'] ?? $opData['gps_longitude'] ?? null;
+
                     // Fallback geographical info
-                    $defaultCarre = \App\Models\Parameters\Carre::first();
-                    if ($defaultCarre) {
-                        $mappedData['carre_id'] = $defaultCarre->id;
-                        $mappedData['quartier_id'] = $defaultCarre->quartier_id;
+                    if (empty($mappedData['carre_id'])) {
+                        $defaultCarre = \App\Models\Parameters\Carre::first();
+                        if ($defaultCarre) {
+                            $mappedData['carre_id'] = $defaultCarre->id;
+                            $mappedData['quartier_id'] = $defaultCarre->quartier_id;
+                        }
+                    }
+
+                    // Check duplicate: Règle 3 & 4 : RCCM & NIF Uniqueness, Règle 5 : raison sociale / nom commercial in campaign
+                    $rccm = $mappedData['rccm'] ?? null;
+                    $nif = $mappedData['nif'] ?? null;
+                    $nom = $mappedData['nom_commercial'] ?? null;
+                    if ($rccm) {
+                        $exists = Operateur::where('rccm', $rccm)->where('id', '!=', $id)->exists();
+                        if ($exists) {
+                            throw new Exception("Ce numéro RCCM est déjà enregistré pour un autre opérateur économique.");
+                        }
+                    }
+                    if ($nif) {
+                        $exists = Operateur::where('nif', $nif)->where('id', '!=', $id)->exists();
+                        if ($exists) {
+                            throw new Exception("Ce numéro NIF est déjà enregistré pour un autre opérateur économique.");
+                        }
+                    }
+                    if ($nom) {
+                        $exists = Operateur::where('nom_commercial', $nom)
+                            ->where('id', '!=', $id)
+                            ->exists();
+                        if ($exists) {
+                            throw new Exception("Cet opérateur économique a déjà été recensé.");
+                        }
                     }
 
                     $op->fill($mappedData);
@@ -310,11 +373,24 @@ class SyncApiController extends Controller
 
         $lastSync = date('Y-m-d H:i:s', $request->input('last_sync_timestamp'));
 
-        // Récupérer uniquement les fiches créées ou modifiées depuis la dernière synchro
-        // L'isolation de sécurité d'enquêteur s'applique automatiquement !
-        $recensements = Recensement::where('updated_at', '>=', $lastSync)->get();
-        $maisons = Maison::where('updated_at', '>=', $lastSync)->get();
-        $operateurs = Operateur::where('updated_at', '>=', $lastSync)->get();
+        $user = auth()->user();
+        $isAdmin = $user && $user->hasRole(['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']);
+        $agent = $user ? $user->agent : null;
+        $agentId = $agent ? $agent->id : null;
+
+        $recensementsQuery = Recensement::where('updated_at', '>=', $lastSync);
+        $maisonsQuery = Maison::where('updated_at', '>=', $lastSync);
+        $operateursQuery = Operateur::where('updated_at', '>=', $lastSync);
+
+        if (!$isAdmin) {
+            $recensementsQuery->where('enqueteur_id', $agentId);
+            $maisonsQuery->where('enqueteur_id', $agentId);
+            $operateursQuery->where('enqueteur_id', $agentId);
+        }
+
+        $recensements = $recensementsQuery->get();
+        $maisons = $maisonsQuery->get();
+        $operateurs = $operateursQuery->get();
 
         return $this->buildResponse(
             success: true,

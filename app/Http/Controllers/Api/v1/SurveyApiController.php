@@ -47,8 +47,16 @@ class SurveyApiController extends Controller
                 $recensement->statut = RecensementStatut::SOUMIS;
 
                 // Assignation automatique de l'agent enquêteur connecté via Sanctum
-                if (auth()->check() && auth()->user()->agent) {
-                    $recensement->enqueteur_id = auth()->user()->agent->id;
+                // Check duplicate: Règle 6 : Détection de doublons (même téléphone principal + même adresse)
+                $tel = $validated['chefTelephone'] ?? $validated['chef_telephone'] ?? null;
+                $adr = $validated['adresse'] ?? null;
+                if ($tel && $adr) {
+                    $exists = Recensement::where('chef_telephone', $tel)
+                        ->where('adresse', $adr)
+                        ->exists();
+                    if ($exists) {
+                        throw new Exception("Un ménage avec le même numéro de téléphone et la même adresse existe déjà.");
+                    }
                 }
 
                 $recensement->save();
@@ -124,12 +132,26 @@ class SurveyApiController extends Controller
             $maison->assainissement_id = $data['assainissement_id'] ?? $data['assainissementId'] ?? $data['assainissement'] ?? $data['accesAssainissement'] ?? null;
             $maison->gestion_dechet_id = $data['gestion_dechet_id'] ?? $data['gestionDechetId'] ?? $data['gestion_dechet'] ?? $data['gestionDechets'] ?? null;
 
+            if (isset($data['carre_id'])) {
+                $maison->carre_id = $data['carre_id'];
+            }
+
             if (auth()->check() && auth()->user()->agent) {
                 $maison->enqueteur_id = auth()->user()->agent->id;
             }
 
-            if (isset($data['carre_id'])) {
-                $maison->carre_id = $data['carre_id'];
+            // Check duplicate: Règle 2 : Détection de doublons (même adresse + même numéro de porte + même carré)
+            $porte = $maison->numero_porte;
+            $adr = $maison->adresse;
+            $carreId = $maison->carre_id;
+            if ($adr && $porte && $carreId) {
+                $exists = Maison::where('adresse', $adr)
+                    ->where('numero_porte', $porte)
+                    ->where('carre_id', $carreId)
+                    ->exists();
+                if ($exists) {
+                    throw new Exception("Une habitation avec la même adresse, le même numéro de porte et dans le même carré existe déjà.");
+                }
             }
 
             $maison->save();
@@ -174,6 +196,39 @@ class SurveyApiController extends Controller
                 }
             }
             $op->statut = OperateurStatut::SOUMIS;
+
+            $op->carre_id = $data['carre_id'] ?? $data['carreId'] ?? null;
+            $op->quartier_id = $data['quartier_id'] ?? $data['quartierId'] ?? null;
+            if (empty($op->carre_id)) {
+                $defaultCarre = \App\Models\Parameters\Carre::first();
+                if ($defaultCarre) {
+                    $op->carre_id = $defaultCarre->id;
+                    $op->quartier_id = $defaultCarre->quartier_id;
+                }
+            }
+
+            // Check duplicate: Règle 3 & 4 : RCCM & NIF Uniqueness, Règle 5 : raison sociale / nom commercial in campaign
+            $rccm = $data['rccm'] ?? null;
+            $nif = $data['nif'] ?? null;
+            $nom = $op->nom_commercial;
+            if ($rccm) {
+                $exists = Operateur::where('rccm', $rccm)->exists();
+                if ($exists) {
+                    throw new Exception("Ce numéro RCCM est déjà enregistré pour un autre opérateur économique.");
+                }
+            }
+            if ($nif) {
+                $exists = Operateur::where('nif', $nif)->exists();
+                if ($exists) {
+                    throw new Exception("Ce numéro NIF est déjà enregistré pour un autre opérateur économique.");
+                }
+            }
+            if ($nom) {
+                $exists = Operateur::where('nom_commercial', $nom)->exists();
+                if ($exists) {
+                    throw new Exception("Cet opérateur économique a déjà été recensé.");
+                }
+            }
 
             if (auth()->check() && auth()->user()->agent) {
                 $op->enqueteur_id = auth()->user()->agent->id;

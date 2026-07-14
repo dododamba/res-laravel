@@ -105,11 +105,16 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
             // Users
             Route::get('/users', [App\Http\Controllers\Api\v1\AdminApiController::class, 'listUsers']);
+            Route::post('/users', [App\Http\Controllers\Api\v1\AdminApiController::class, 'storeUser']);
             Route::get('/users/{id}', [App\Http\Controllers\Api\v1\AdminApiController::class, 'showUser']);
             Route::put('/users/{id}', [App\Http\Controllers\Api\v1\AdminApiController::class, 'updateUser']);
             Route::delete('/users/{id}', [App\Http\Controllers\Api\v1\AdminApiController::class, 'destroyUser']);
             Route::get('/roles', [App\Http\Controllers\Api\v1\AdminApiController::class, 'listRoles']);
             Route::put('/users/{id}/permissions', [App\Http\Controllers\Api\v1\AdminApiController::class, 'updateUserPermissions']);
+
+            // Affectations (Assignments)
+            Route::post('/agents/{agentId}/affectations', [App\Http\Controllers\Api\v1\AdminApiController::class, 'storeAgentAffectation']);
+            Route::delete('/affectations/{id}', [App\Http\Controllers\Api\v1\AdminApiController::class, 'destroyAffectation']);
         });
     });
 });

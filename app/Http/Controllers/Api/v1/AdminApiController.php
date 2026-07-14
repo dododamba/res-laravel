@@ -21,6 +21,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Models\Affectation;
+use App\Models\Campagne;
 
 class AdminApiController extends Controller
 {
@@ -792,5 +794,84 @@ class AdminApiController extends Controller
 
         $user->load(['permissions']);
         return $this->buildResponse(true, "Les surcharges de droits de l'utilisateur ont été mises à jour.", $user);
+    }
+
+    public function storeUser(Request $request): JsonResponse
+    {
+        $request->validate([
+            'email' => 'required|email|max:180|unique:users,email',
+            'firstname' => 'nullable|string|max:255',
+            'lastname' => 'nullable|string|max:255',
+            'telephone' => 'nullable|string|max:50',
+            'status' => 'required|string|in:active,pending,suspended',
+            'is_active' => 'required|boolean',
+            'password' => 'required|string|min:8',
+            'roles' => 'required|array',
+            'roles.*' => 'exists:roles,id',
+        ]);
+
+        $user = DB::transaction(function () use ($request) {
+            $user = User::create([
+                'email' => $request->input('email'),
+                'firstname' => $request->input('firstname'),
+                'lastname' => $request->input('lastname'),
+                'telephone' => $request->input('telephone'),
+                'status' => $request->input('status'),
+                'is_active' => $request->boolean('is_active'),
+                'password' => Hash::make($request->input('password')),
+            ]);
+
+            $user->roles()->sync($request->input('roles'));
+
+            return $user;
+        });
+
+        $user->load(['roles', 'agent.personne']);
+        return $this->buildResponse(true, "Compte utilisateur créé avec succès.", $user);
+    }
+
+    public function storeAgentAffectation(Request $request, string $agentId): JsonResponse
+    {
+        $agent = Agent::findOrFail($agentId);
+
+        $request->validate([
+            'quartier_id' => 'required|exists:quartiers,id',
+            'carre_id' => 'nullable|exists:carres,id',
+        ]);
+
+        // Check if duplicate assignment exists
+        $exists = Affectation::where('agent_id', $agentId)
+            ->where('quartier_id', $request->input('quartier_id'))
+            ->where('carre_id', $request->input('carre_id'))
+            ->where('statut', 'actif')
+            ->exists();
+
+        if ($exists) {
+            return $this->buildResponse(false, "Cet agent est déjà affecté à cette zone.", null, [], 400);
+        }
+
+        // Resolve active campaign
+        $campagne = Campagne::where('statut', 'ACTIVE')->first() ?? Campagne::first();
+
+        $affectation = Affectation::create([
+            'id' => (string) Str::uuid(),
+            'agent_id' => $agentId,
+            'fonction_id' => $agent->fonction_id,
+            'quartier_id' => $request->input('quartier_id'),
+            'carre_id' => $request->input('carre_id'),
+            'campagne_id' => $campagne ? $campagne->id : null,
+            'date_debut' => now(),
+            'statut' => 'actif',
+        ]);
+
+        return $this->buildResponse(true, "Affectation créée avec succès.", $affectation);
+    }
+
+    public function destroyAffectation(string $id): JsonResponse
+    {
+        $affectation = Affectation::findOrFail($id);
+        $affectation->delete();
+
+        return $this->buildResponse(true, "Affectation supprimée avec succès.");
     }
 }
