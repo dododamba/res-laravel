@@ -19,7 +19,10 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     // Espace de compatibilité spécifique pour l'application Mobile Ionic (/api/v1/auth/*)
     Route::prefix('auth')->group(function () {
         Route::post('/login', [App\Http\Controllers\Api\v1\AuthApiController::class, 'login'])->name('auth.login');
-        Route::middleware('auth:sanctum')->get('/profile', [App\Http\Controllers\Api\v1\AuthApiController::class, 'profile'])->name('auth.profile');
+        Route::middleware('auth:sanctum')->group(function () {
+            Route::get('/profile', [App\Http\Controllers\Api\v1\AuthApiController::class, 'profile'])->name('auth.profile');
+            Route::post('/profile', [App\Http\Controllers\Api\v1\AuthApiController::class, 'updateProfile'])->name('auth.profile.update');
+        });
     });
 
     // 1. Routes d'authentification publiques (génération de tokens JWT/Sanctum)

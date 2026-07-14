@@ -407,4 +407,47 @@ class ProfileAndAuditTest extends TestCase
             'instruction_aucun' => 0,
         ]);
     }
+
+    /**
+     * Test: Mobile profile update compatibility endpoint (/api/v1/auth/profile).
+     */
+    public function test_mise_a_jour_profil_api_compatibilite_ionic(): void
+    {
+        Storage::fake('public');
+        $token = $this->enqueteurUser->createToken('test-token')->plainTextToken;
+
+        $avatarFile = UploadedFile::fake()->image('avatar.jpg', 200, 200);
+
+        $payload = [
+            'firstname' => 'Émile Nouveau API',
+            'lastname' => 'Zola Nouveau API',
+            'email' => 'emile.nouveau.api@recensement.gov',
+            'telephone' => '0771234567',
+            'avatar' => $avatarFile,
+        ];
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+                         ->postJson('/api/v1/auth/profile', $payload);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('status', 'success');
+        $response->assertJsonPath('data.firstname', 'Émile Nouveau API');
+        $response->assertJsonPath('data.email', 'emile.nouveau.api@recensement.gov');
+
+        // Check DB update
+        $this->assertDatabaseHas('users', [
+            'id' => $this->enqueteurUser->id,
+            'firstname' => 'Émile Nouveau API',
+            'email' => 'emile.nouveau.api@recensement.gov',
+            'telephone' => '0771234567',
+        ]);
+
+        $user = User::find($this->enqueteurUser->id);
+        $this->assertNotNull($user->avatar);
+        $this->assertFileExists(public_path('uploads/avatars/' . $user->avatar));
+        
+        // Clean up the uploaded file to keep the filesystem clean
+        @unlink(public_path('uploads/avatars/' . $user->avatar));
+    }
 }
+

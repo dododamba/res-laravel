@@ -113,10 +113,14 @@ class AuthApiController extends Controller
                 'user' => [
                     'id' => $user->id,
                     'email' => $user->email,
+                    'firstname' => $user->firstname,
+                    'lastname' => $user->lastname,
                     'fullname' => trim("{$user->firstname} {$user->lastname}"),
+                    'telephone' => $user->telephone,
                     'role' => $roleName,
                     'agent_matricule' => $agent ? $agent->matricule : null,
                     'agent_id' => $agent ? $agent->id : null,
+                    'avatar' => $user->avatar ? asset('uploads/avatars/' . $user->avatar) : null,
                 ]
             ]
         );
@@ -137,10 +141,86 @@ class AuthApiController extends Controller
             data: [
                 'id' => $user->id,
                 'email' => $user->email,
+                'firstname' => $user->firstname,
+                'lastname' => $user->lastname,
                 'fullname' => trim("{$user->firstname} {$user->lastname}"),
+                'telephone' => $user->telephone,
                 'role' => $roleName,
                 'agent_matricule' => $agent ? $agent->matricule : null,
                 'agent_id' => $agent ? $agent->id : null,
+                'avatar' => $user->avatar ? asset('uploads/avatars/' . $user->avatar) : null,
+            ]
+        );
+    }
+
+    /**
+     * Endpoint API : Modifier le profil de l'Agent d'Enquêtes connecté (Mobile)
+     */
+    public function updateProfile(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = auth()->user();
+
+        $request->validate([
+            'email' => 'required|email|max:180|unique:users,email,' . $user->id,
+            'firstname' => 'nullable|string|max:255',
+            'lastname' => 'nullable|string|max:255',
+            'telephone' => 'nullable|string|max:50',
+            'password' => 'nullable|string|min:8|confirmed',
+            'avatar' => 'nullable|image|max:2048', // Max 2Mo
+        ]);
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $user) {
+            $user->fill($request->only('email', 'firstname', 'lastname', 'telephone'));
+
+            // Gestion du mot de passe
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->input('password'));
+            }
+
+            // Gestion de l'image de profil (Avatar)
+            if ($request->hasFile('avatar')) {
+                $file = $request->file('avatar');
+                $filename = (string) \Illuminate\Support\Str::uuid() . '.' . $file->getClientOriginalExtension();
+                // Ensure directory exists
+                $destinationPath = public_path('uploads/avatars');
+                if (!file_exists($destinationPath)) {
+                    mkdir($destinationPath, 0755, true);
+                }
+                $file->move($destinationPath, $filename);
+                $user->avatar = $filename;
+            }
+
+            $user->save();
+
+            // Règle métier Symfony : Si un Agent physique est lié, synchroniser sa fiche civile
+            if ($user->agent && $user->agent->personne) {
+                $user->agent->personne->update([
+                    'email' => $user->email,
+                    'prenom' => $user->firstname ?? $user->agent->personne->prenom,
+                    'nom' => $user->lastname ?? $user->agent->personne->nom,
+                    'telephone' => $user->telephone ?? $user->agent->personne->telephone,
+                ]);
+            }
+        });
+
+        $agent = $user->agent;
+        $roleName = $user->roles()->first()?->name ?? 'Utilisateur';
+
+        return $this->buildResponse(
+            success: true,
+            message: "Profil mis à jour avec succès.",
+            data: [
+                'id' => $user->id,
+                'email' => $user->email,
+                'firstname' => $user->firstname,
+                'lastname' => $user->lastname,
+                'fullname' => trim("{$user->firstname} {$user->lastname}"),
+                'telephone' => $user->telephone,
+                'role' => $roleName,
+                'agent_matricule' => $agent ? $agent->matricule : null,
+                'agent_id' => $agent ? $agent->id : null,
+                'avatar' => $user->avatar ? asset('uploads/avatars/' . $user->avatar) : null,
             ]
         );
     }
