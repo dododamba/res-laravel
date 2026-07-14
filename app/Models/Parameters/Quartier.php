@@ -24,6 +24,22 @@ class Quartier extends BaseParameterModel
     }
 
     /**
+     * Un quartier englobe plusieurs recensements (ménages).
+     */
+    public function recensements()
+    {
+        return $this->hasMany(\App\Models\Recensement::class, 'quartier_id');
+    }
+
+    /**
+     * Un quartier englobe plusieurs opérateurs économiques.
+     */
+    public function operateurs()
+    {
+        return $this->hasMany(\App\Models\Operateur::class, 'quartier_id');
+    }
+
+    /**
      * Récupère le Délégué communal actuellement affecté au Quartier (Règle métier Symfony).
      */
     public function getDelegueAttribute()

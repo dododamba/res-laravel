@@ -45,6 +45,22 @@ class Carre extends BaseParameterModel
     }
 
     /**
+     * Un carré englobe plusieurs recensements (ménages).
+     */
+    public function recensements()
+    {
+        return $this->hasMany(\App\Models\Recensement::class, 'carre_id');
+    }
+
+    /**
+     * Un carré englobe plusieurs opérateurs économiques.
+     */
+    public function operateurs()
+    {
+        return $this->hasMany(\App\Models\Operateur::class, 'carre_id');
+    }
+
+    /**
      * Récupère le Chef de Carré actuellement affecté (Règle métier Symfony).
      */
     public function getChefCarreAttribute()

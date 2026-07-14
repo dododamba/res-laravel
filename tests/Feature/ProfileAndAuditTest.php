@@ -312,6 +312,41 @@ class ProfileAndAuditTest extends TestCase
     }
 
     /**
+     * Test: Mobile global stats (/api/v1/global-stats) returns correct keys.
+     */
+    public function test_api_global_stats_mobile(): void
+    {
+        $token = $this->enqueteurUser->createToken('test-token')->plainTextToken;
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+                         ->getJson('/api/v1/global-stats');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('status', 'success');
+        $response->assertJsonStructure([
+            'status',
+            'message',
+            'data' => [
+                'total_menages',
+                'total_population',
+                'total_hommes',
+                'total_femmes',
+                'total_enfants',
+                'total_jeunes',
+                'total_handicapes',
+                'instruction_aucun',
+                'instruction_primaire',
+                'instruction_secondaire',
+                'instruction_superieur',
+                'total_habitations',
+                'total_entreprises',
+                'homme_ratio',
+                'femme_ratio',
+            ]
+        ]);
+    }
+
+    /**
      * Test: API Synchronization compatibility with original Ionic mobile payload structures.
      */
     public function test_api_synchronisation_compatibilite_ionic_payload(): void

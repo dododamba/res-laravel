@@ -48,6 +48,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         // Indicateurs et affectations géographiques pour le dashboard mobile
         Route::get('/dashboard', [App\Http\Controllers\Api\v1\MobileDashboardController::class, 'getDashboard'])->name('mobile.dashboard');
         Route::get('/assignments', [App\Http\Controllers\Api\v1\MobileDashboardController::class, 'getAssignments'])->name('mobile.assignments');
+        Route::get('/global-stats', [App\Http\Controllers\Api\v1\MobileDashboardController::class, 'getGlobalStats'])->name('mobile.global-stats');
 
         // Gestion administrative - Rôles ADMIN requis
         Route::prefix('admin')->middleware('admin.api')->group(function () {

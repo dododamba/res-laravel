@@ -45,7 +45,10 @@ class AdminApiController extends Controller
             $query->search($searchTerm);
         }
 
-        $entities = $query->orderBy('ordre_affichage', 'asc')->get();
+        $entities = $query->withCount(['carres', 'recensements', 'operateurs'])
+            ->withSum('recensements', 'nombre_personnes')
+            ->orderBy('ordre_affichage', 'asc')
+            ->get();
         return $this->buildResponse(true, "Quartiers récupérés.", $entities);
     }
 
@@ -158,7 +161,10 @@ class AdminApiController extends Controller
             $query->search($searchTerm);
         }
 
-        $entities = $query->orderBy('ordre_affichage', 'asc')->get();
+        $entities = $query->withCount(['recensements', 'operateurs'])
+            ->withSum('recensements', 'nombre_personnes')
+            ->orderBy('ordre_affichage', 'asc')
+            ->get();
         return $this->buildResponse(true, "Carrés récupérés.", $entities);
     }
 

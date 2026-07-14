@@ -200,4 +200,62 @@ class MobileDashboardController extends Controller
             data: $mapped
         );
     }
+
+    /**
+     * Endpoint API : Statistiques démographiques globales
+     */
+    public function getGlobalStats(Request $request): JsonResponse
+    {
+        // Agrégations démographiques globales optimisées
+        $menagesAgreges = Recensement::query()
+            ->selectRaw('
+                COUNT(id) as total_menages,
+                SUM(nombre_personnes) as total_population,
+                SUM(nombre_hommes) as total_hommes,
+                SUM(nombre_femmes) as total_femmes,
+                SUM(nombre_enfants) as total_enfants,
+                SUM(nombre_jeunes) as total_jeunes,
+                SUM(nombre_handicapes) as total_handicapes,
+                SUM(instruction_aucun) as instruction_aucun,
+                SUM(instruction_primaire) as instruction_primaire,
+                SUM(instruction_secondaire) as instruction_secondaire,
+                SUM(instruction_superieur) as instruction_superieur
+            ')
+            ->first();
+
+        $totalHabitations = Maison::count();
+        $totalEntreprises = Operateur::count();
+
+        $totalPop = (int)($menagesAgreges->total_population ?? 0);
+        $hommeRatio = 0;
+        $femmeRatio = 0;
+        if ($totalPop > 0) {
+            $hommeRatio = round((($menagesAgreges->total_hommes ?? 0) / $totalPop) * 100, 1);
+            $femmeRatio = round((($menagesAgreges->total_femmes ?? 0) / $totalPop) * 100, 1);
+        }
+
+        $stats = [
+            'total_menages' => (int)($menagesAgreges->total_menages ?? 0),
+            'total_population' => $totalPop,
+            'total_hommes' => (int)($menagesAgreges->total_hommes ?? 0),
+            'total_femmes' => (int)($menagesAgreges->total_femmes ?? 0),
+            'total_enfants' => (int)($menagesAgreges->total_enfants ?? 0),
+            'total_jeunes' => (int)($menagesAgreges->total_jeunes ?? 0),
+            'total_handicapes' => (int)($menagesAgreges->total_handicapes ?? 0),
+            'instruction_aucun' => (int)($menagesAgreges->instruction_aucun ?? 0),
+            'instruction_primaire' => (int)($menagesAgreges->instruction_primaire ?? 0),
+            'instruction_secondaire' => (int)($menagesAgreges->instruction_secondaire ?? 0),
+            'instruction_superieur' => (int)($menagesAgreges->instruction_superieur ?? 0),
+            'total_habitations' => $totalHabitations,
+            'total_entreprises' => $totalEntreprises,
+            'homme_ratio' => $hommeRatio,
+            'femme_ratio' => $femmeRatio,
+        ];
+
+        return $this->buildResponse(
+            success: true,
+            message: "Statistiques globales récupérées avec succès.",
+            data: $stats
+        );
+    }
 }
