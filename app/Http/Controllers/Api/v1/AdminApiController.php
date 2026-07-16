@@ -63,6 +63,8 @@ class AdminApiController extends Controller
             'couleur' => ['nullable', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
             'icone' => 'nullable|string|max:50',
             'ordre_affichage' => 'nullable|integer',
+            'chef_nom' => 'nullable|string|max:255',
+            'chef_telephone' => 'nullable|string|max:100',
         ]);
 
         $entity = Quartier::create([
@@ -72,6 +74,8 @@ class AdminApiController extends Controller
             'couleur' => $request->input('couleur'),
             'icone' => $request->input('icone'),
             'ordre_affichage' => $request->input('ordre_affichage', 0),
+            'chef_nom' => $request->input('chef_nom'),
+            'chef_telephone' => $request->input('chef_telephone'),
             'is_active' => $request->boolean('is_active', true),
         ]);
 
@@ -94,6 +98,8 @@ class AdminApiController extends Controller
             'icone' => 'nullable|string|max:50',
             'ordre_affichage' => 'nullable|integer',
             'is_active' => 'required|boolean',
+            'chef_nom' => 'nullable|string|max:255',
+            'chef_telephone' => 'nullable|string|max:100',
         ]);
 
         $entity = Quartier::withTrashed()->findOrFail($id);
@@ -104,6 +110,8 @@ class AdminApiController extends Controller
             'couleur' => $request->input('couleur'),
             'icone' => $request->input('icone'),
             'ordre_affichage' => $request->input('ordre_affichage', $entity->ordre_affichage),
+            'chef_nom' => $request->input('chef_nom'),
+            'chef_telephone' => $request->input('chef_telephone'),
             'is_active' => $request->boolean('is_active', $entity->is_active),
         ]);
 
@@ -181,6 +189,8 @@ class AdminApiController extends Controller
             'ordre_affichage' => 'nullable|integer',
             'quartier_id' => 'required|exists:quartiers,id',
             'est_chef' => 'nullable|boolean',
+            'chef_nom' => 'nullable|string|max:255',
+            'chef_telephone' => 'nullable|string|max:100',
         ]);
 
         $entity = Carre::create([
@@ -192,6 +202,8 @@ class AdminApiController extends Controller
             'ordre_affichage' => $request->input('ordre_affichage', 0),
             'quartier_id' => $request->input('quartier_id'),
             'est_chef' => $request->boolean('est_chef', false),
+            'chef_nom' => $request->input('chef_nom'),
+            'chef_telephone' => $request->input('chef_telephone'),
             'is_active' => $request->boolean('is_active', true),
         ]);
 
@@ -216,6 +228,8 @@ class AdminApiController extends Controller
             'quartier_id' => 'required|exists:quartiers,id',
             'est_chef' => 'nullable|boolean',
             'is_active' => 'required|boolean',
+            'chef_nom' => 'nullable|string|max:255',
+            'chef_telephone' => 'nullable|string|max:100',
         ]);
 
         $entity = Carre::withTrashed()->findOrFail($id);
@@ -228,6 +242,8 @@ class AdminApiController extends Controller
             'ordre_affichage' => $request->input('ordre_affichage', $entity->ordre_affichage),
             'quartier_id' => $request->input('quartier_id'),
             'est_chef' => $request->boolean('est_chef', $entity->est_chef),
+            'chef_nom' => $request->input('chef_nom'),
+            'chef_telephone' => $request->input('chef_telephone'),
             'is_active' => $request->boolean('is_active', $entity->is_active),
         ]);
 

@@ -182,6 +182,8 @@ class SyncApiController extends Controller
                         'gps_altitude' => $maisonData['gps_altitude'] ?? $maisonData['gpsAltitude'] ?? null,
                         'gps_precision' => $maisonData['gps_precision'] ?? $maisonData['gpsPrecision'] ?? null,
                         'gps_date_capture' => $maisonData['gps_date_capture'] ?? $maisonData['gpsDateCapture'] ?? null,
+                        'proprietaire_nom' => $maisonData['proprietaire_nom'] ?? $maisonData['proprietaireNom'] ?? null,
+                        'proprietaire_telephone' => $maisonData['proprietaire_telephone'] ?? $maisonData['proprietaireTelephone'] ?? null,
                         'statut' => \App\Enums\MaisonStatut::SOUMIS,
                     ];
 

@@ -121,6 +121,8 @@ class SurveyApiController extends Controller
             $maison->nombre_enfants = (int)($data['nombreEnfants'] ?? $data['nombre_enfants'] ?? 0);
             $maison->gps_latitude = $data['gpsLatitude'] ?? null;
             $maison->gps_longitude = $data['gpsLongitude'] ?? null;
+            $maison->proprietaire_nom = $data['proprietaire_nom'] ?? $data['proprietaireNom'] ?? null;
+            $maison->proprietaire_telephone = $data['proprietaire_telephone'] ?? $data['proprietaireTelephone'] ?? null;
             $maison->statut = MaisonStatut::SOUMIS;
 
             $maison->reference_cadastrale = $data['referenceCadastrale'] ?? $data['reference_cadastrale'] ?? null;

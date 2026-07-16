@@ -43,6 +43,8 @@ class Maison extends Model implements HasMedia
         'enqueteur_id',
         'controleur_id',
         'validateur_id',
+        'proprietaire_nom',
+        'proprietaire_telephone',
     ];
 
     protected $casts = [

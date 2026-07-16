@@ -31,8 +31,8 @@ class ReferenceApiController extends Controller
     public function index(): JsonResponse
     {
         // Récupération de l'ensemble des données de références actives
-        $quartiers = Quartier::active()->orderBy('ordre_affichage')->get(['id', 'nom', 'code', 'slug', 'couleur', 'icone']);
-        $carres = Carre::active()->orderBy('ordre_affichage')->get(['id', 'nom', 'code', 'slug', 'quartier_id', 'est_chef']);
+        $quartiers = Quartier::active()->orderBy('ordre_affichage')->get(['id', 'nom', 'code', 'slug', 'couleur', 'icone', 'chef_nom', 'chef_telephone']);
+        $carres = Carre::active()->orderBy('ordre_affichage')->get(['id', 'nom', 'code', 'slug', 'quartier_id', 'est_chef', 'chef_nom', 'chef_telephone']);
         $secteurs = Secteur::active()->orderBy('ordre_affichage')->get(['id', 'nom', 'code', 'slug', 'carre_id']);
         $avenues = Avenue::active()->orderBy('ordre_affichage')->get(['id', 'nom', 'code', 'slug', 'secteur_id']);
         

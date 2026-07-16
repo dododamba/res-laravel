@@ -115,7 +115,7 @@ class ParameterSeeder extends Seeder
 
         // 7. Peuplement des sources d'énergie
         $sourcesEnergie = [
-            ['nom' => 'Senelec', 'code' => 'SENELEC', 'description' => 'Réseau Senelec / SNE', 'couleur' => '#50CD89', 'icone' => 'bi-lightning-charge-fill', 'ordre_affichage' => 10, 'is_default' => true],
+            ['nom' => 'TchadElec', 'code' => 'TCHADELEC', 'description' => 'Réseau TchadElec / SNE', 'couleur' => '#50CD89', 'icone' => 'bi-lightning-charge-fill', 'ordre_affichage' => 10, 'is_default' => true],
             ['nom' => 'Solaire', 'code' => 'SOLAIRE', 'description' => 'Panneaux Solaires autonomes', 'couleur' => '#FFC700', 'icone' => 'bi-sun', 'ordre_affichage' => 20, 'is_default' => false],
             ['nom' => 'Groupe', 'code' => 'GROUPE', 'description' => 'Groupe Électrogène', 'couleur' => '#7239EA', 'icone' => 'bi-cpu', 'ordre_affichage' => 30, 'is_default' => false],
             ['nom' => 'Aucun', 'code' => 'AUCUN', 'description' => 'Pas d\'électricité', 'couleur' => '#F1416C', 'icone' => 'bi-x-circle', 'ordre_affichage' => 40, 'is_default' => false],
