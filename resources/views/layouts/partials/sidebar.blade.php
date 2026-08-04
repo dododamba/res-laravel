@@ -63,6 +63,56 @@
                     </a>
                 </div>
 
+                <!-- Section : Fiscalité Municipale -->
+                <div class="menu-item pt-5">
+                    <div class="menu-content">
+                        <span class="menu-heading fw-bold text-uppercase fs-8">Fiscalité Municipale</span>
+                    </div>
+                </div>
+
+                <!-- Menu Déroulant : Fiscalité Municipale -->
+                <div class="menu-item menu-accordion {{ request()->routeIs('taxes.*') || request()->routeIs('paiements.*') || request()->routeIs('recouvrements.*') || request()->routeIs('exonerations.*') || request()->routeIs('fiscalite.*') ? 'here show' : '' }}" data-kt-menu-trigger="click">
+                    <span class="menu-link">
+                        <span class="menu-icon">
+                            {!! $theme->getSvgIcon('duotune/finance/fin008.svg', 'svg-icon-2') !!}
+                        </span>
+                        <span class="menu-title">Gestion des Taxes</span>
+                        <span class="menu-arrow"></span>
+                    </span>
+                    <div class="menu-sub menu-sub-accordion">
+                        <div class="menu-item">
+                            <a class="menu-link {{ request()->routeIs('taxes.*') ? 'active' : '' }}" href="{{ route('taxes.index') }}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Taxes Municipales</span>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a class="menu-link {{ request()->routeIs('paiements.*') ? 'active' : '' }}" href="{{ route('paiements.index') }}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Paiements & Encaissements</span>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a class="menu-link {{ request()->routeIs('recouvrements.*') ? 'active' : '' }}" href="{{ route('recouvrements.index') }}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Recouvrements & Relances</span>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a class="menu-link {{ request()->routeIs('exonerations.*') ? 'active' : '' }}" href="{{ route('exonerations.index') }}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Exonérations</span>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a class="menu-link {{ request()->routeIs('fiscalite.dashboard') ? 'active' : '' }}" href="{{ route('fiscalite.dashboard') }}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Tableau de Bord Fiscal</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
                 @can('USER_MANAGE')
                 <!-- Section : Administration & RH -->
                 <div class="menu-item pt-5">

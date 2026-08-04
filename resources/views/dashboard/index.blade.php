@@ -80,9 +80,61 @@
                 </div>
             </div>
         </div>
-    </div>
 </div>
 <!--end::Row-->
+
+<!--begin::Row - Recettes Municipales & Fiscalité (Module Intelligent)-->
+<div class="row g-5 g-xl-10 mb-5 mb-xl-10">
+    <div class="col-12">
+        <div class="card card-flush shadow-sm bg-light-primary border border-primary border-opacity-25">
+            <div class="card-header pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bolder text-gray-900 fs-3">Recettes Municipales & Fiscalité {{ date('Y') }}</span>
+                    <span class="text-muted mt-1 fw-semibold fs-7">Suivi en temps réel de la collecte des taxes sur le potentiel fiscal censé</span>
+                </h3>
+                <div class="card-toolbar">
+                    <a href="{{ route('fiscalite.dashboard') }}" class="btn btn-primary btn-sm">
+                        {!! $theme->getSvgIcon('duotune/finance/fin008.svg', 'svg-icon-2 text-white me-1') !!}
+                        Tableau de Bord Fiscal Détaillé
+                    </a>
+                </div>
+            </div>
+            <div class="card-body pt-2">
+                <div class="row g-5 align-items-center">
+                    <div class="col-md-3">
+                        <div class="bg-white rounded p-4 shadow-xs">
+                            <span class="fs-7 text-muted fw-bold d-block text-uppercase">Total Recettes Attendu</span>
+                            <span class="fs-2hx fw-bolder text-gray-900">{{ number_format($fiscalStats['montant_attendu'] ?? 0) }} F</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-white rounded p-4 shadow-xs">
+                            <span class="fs-7 text-muted fw-bold d-block text-uppercase">Recettes Encaissées</span>
+                            <span class="fs-2hx fw-bolder text-success">{{ number_format($fiscalStats['montant_encaisse'] ?? 0) }} F</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-white rounded p-4 shadow-xs">
+                            <span class="fs-7 text-muted fw-bold d-block text-uppercase">Reste à Payer</span>
+                            <span class="fs-2hx fw-bolder text-danger">{{ number_format($fiscalStats['montant_restant'] ?? 0) }} F</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-white rounded p-4 shadow-xs">
+                            <div class="d-flex flex-stack mb-2">
+                                <span class="fs-7 text-muted fw-bold text-uppercase">Taux Recouvrement</span>
+                                <span class="fs-6 fw-bolder text-primary">{{ $fiscalStats['taux_recouvrement'] ?? 0 }}%</span>
+                            </div>
+                            <div class="progress h-8px bg-light-primary">
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: {{ min(100, $fiscalStats['taux_recouvrement'] ?? 0) }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!--begin::Row - Tableaux récents-->
 <div class="row g-5 g-xl-10 mb-5">

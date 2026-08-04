@@ -56,6 +56,17 @@ Route::middleware(['auth', 'middleware' => App\Http\Middleware\ThemeLayoutMiddle
     Route::post('operateur/{operateur}/transition', [OperateurController::class, 'transition'])->name('operateur.transition');
 
     // -------------------------------------------------------------
+    // Fiscalité Municipale & Recouvrements
+    // -------------------------------------------------------------
+    Route::resource('taxes', App\Http\Controllers\TaxeController::class);
+    Route::post('taxes/{taxe}/toggle', [App\Http\Controllers\TaxeController::class, 'toggle'])->name('taxes.toggle');
+    Route::resource('paiements', App\Http\Controllers\PaiementTaxeController::class);
+    Route::get('paiements/{paiement}/recu', [App\Http\Controllers\PaiementTaxeController::class, 'printRecu'])->name('paiements.recu');
+    Route::resource('recouvrements', App\Http\Controllers\RecouvrementController::class);
+    Route::resource('exonerations', App\Http\Controllers\ExonerationController::class);
+    Route::get('fiscalite/dashboard', [App\Http\Controllers\FiscalDashboardController::class, 'index'])->name('fiscalite.dashboard');
+
+    // -------------------------------------------------------------
     // Administration & Paramétrages (Réservé ROLE_ADMIN / RBAC)
     // -------------------------------------------------------------
     Route::middleware('can:PARAM_VIEW')->prefix('admin')->group(function () {

@@ -53,6 +53,29 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::get('/assignments', [App\Http\Controllers\Api\v1\MobileDashboardController::class, 'getAssignments'])->name('mobile.assignments');
         Route::get('/global-stats', [App\Http\Controllers\Api\v1\MobileDashboardController::class, 'getGlobalStats'])->name('mobile.global-stats');
 
+        // -------------------------------------------------------------
+        // REST API Fiscalité Municipale & Recouvrement
+        // -------------------------------------------------------------
+        Route::get('/taxes', [App\Http\Controllers\Api\v1\TaxeApiController::class, 'index']);
+        Route::get('/taxes/{id}', [App\Http\Controllers\Api\v1\TaxeApiController::class, 'show']);
+        Route::post('/taxes', [App\Http\Controllers\Api\v1\TaxeApiController::class, 'store']);
+        Route::put('/taxes/{id}', [App\Http\Controllers\Api\v1\TaxeApiController::class, 'update']);
+        Route::delete('/taxes/{id}', [App\Http\Controllers\Api\v1\TaxeApiController::class, 'destroy']);
+
+        Route::get('/paiements', [App\Http\Controllers\Api\v1\PaiementApiController::class, 'index']);
+        Route::post('/paiements', [App\Http\Controllers\Api\v1\PaiementApiController::class, 'store']);
+        Route::post('/paiements/create', [App\Http\Controllers\Api\v1\PaiementApiController::class, 'store']);
+
+        Route::get('/operateurs/{id}/taxes', [App\Http\Controllers\Api\v1\OperateurTaxeApiController::class, 'getOperateurTaxes']);
+        Route::get('/dashboard/taxes', [App\Http\Controllers\Api\v1\FiscalDashboardApiController::class, 'getDashboardStats']);
+        Route::get('/statistiques/taxes', [App\Http\Controllers\Api\v1\FiscalDashboardApiController::class, 'getDashboardStats']);
+
+        Route::get('/recouvrements', [App\Http\Controllers\Api\v1\RecouvrementApiController::class, 'index']);
+        Route::post('/recouvrements', [App\Http\Controllers\Api\v1\RecouvrementApiController::class, 'store']);
+
+        Route::get('/exonerations', [App\Http\Controllers\Api\v1\ExonerationApiController::class, 'index']);
+        Route::post('/exonerations', [App\Http\Controllers\Api\v1\ExonerationApiController::class, 'store']);
+
         // Gestion administrative - Rôles ADMIN requis
         Route::prefix('admin')->middleware('admin.api')->group(function () {
             // Quartiers

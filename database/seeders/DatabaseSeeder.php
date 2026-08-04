@@ -20,6 +20,9 @@ class DatabaseSeeder extends Seeder
 
             // 3. Initialisation des utilisateurs d'administration et d'enquêtes terrain
             UserSeeder::class,
+
+            // 4. Initialisation du tableau officiel des taxes municipales
+            TaxeSeeder::class,
         ]);
     }
 }

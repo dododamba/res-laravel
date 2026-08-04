@@ -118,4 +118,42 @@ class Operateur extends Model implements HasMedia
     {
         return $this->hasMany(HistoriqueOperateur::class, 'operateur_id')->orderBy('created_at', 'desc');
     }
+
+    /**
+     * Taxes affectées à l'opérateur.
+     */
+    public function taxesAffectees()
+    {
+        return $this->hasMany(TaxeOperateur::class, 'operateur_id')->orderBy('date_limite', 'asc');
+    }
+
+    /**
+     * Ensemble des paiements effectués par l'opérateur via ses taxes affectées.
+     */
+    public function paiements()
+    {
+        return $this->hasManyThrough(PaiementTaxe::class, TaxeOperateur::class, 'operateur_id', 'taxe_operateur_id');
+    }
+
+    public function getTotalDuAttribute(): float
+    {
+        return (float) $this->taxesAffectees()->sum('montant_attendu');
+    }
+
+    public function getTotalPayeAttribute(): float
+    {
+        return (float) $this->taxesAffectees()->sum('montant_paye');
+    }
+
+    public function getResteAPayerAttribute(): float
+    {
+        return (float) $this->taxesAffectees()->sum('reste_a_payer');
+    }
+
+    public function getTauxRecouvrementAttribute(): float
+    {
+        $du = $this->total_du;
+        if ($du <= 0) return 100.0;
+        return round(($this->total_paye / $du) * 100, 2);
+    }
 }

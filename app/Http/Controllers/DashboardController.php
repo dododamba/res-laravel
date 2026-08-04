@@ -77,8 +77,23 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        // 5. Statistiques financières de fiscalité municipale
+        $anneeCourante = date('Y');
+        $montantAttendu = (float) \App\Models\TaxeOperateur::where('annee_fiscale', $anneeCourante)->sum('montant_attendu');
+        $montantEncaisse = (float) \App\Models\TaxeOperateur::where('annee_fiscale', $anneeCourante)->sum('montant_paye');
+        $montantRestant = (float) \App\Models\TaxeOperateur::where('annee_fiscale', $anneeCourante)->sum('reste_a_payer');
+        $tauxRecouvrement = $montantAttendu > 0 ? round(($montantEncaisse / $montantAttendu) * 100, 1) : 100.0;
+
+        $fiscalStats = [
+            'montant_attendu' => $montantAttendu,
+            'montant_encaisse' => $montantEncaisse,
+            'montant_restant' => $montantRestant,
+            'taux_recouvrement' => $tauxRecouvrement,
+        ];
+
         return view('dashboard.index', [
             'stats' => $stats,
+            'fiscalStats' => $fiscalStats,
             'recentRecensements' => $recentRecensements,
             'recentMaisons' => $recentMaisons,
         ]);
