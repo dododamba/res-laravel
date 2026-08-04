@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 
 abstract class AbstractParameterController extends Controller
@@ -21,6 +22,48 @@ abstract class AbstractParameterController extends Controller
      * Retourne le préfixe du nom de la route (ex: 'quartier').
      */
     abstract protected function getRoutePrefix(): string;
+
+    /**
+     * Retourne le label lisible du paramètre (ex: 'Besoins Prioritaires').
+     * Peut être surchargé par les contrôleurs enfants.
+     */
+    protected function getParameterLabel(): string
+    {
+        return ucwords(str_replace(['-', '_'], ' ', $this->getRoutePrefix()));
+    }
+
+    /**
+     * Retourne le label singulier du paramètre.
+     */
+    protected function getParameterLabelSingular(): string
+    {
+        return rtrim($this->getParameterLabel(), 's');
+    }
+
+    /**
+     * Résout le nom de la vue : utilise la vue spécifique si elle existe,
+     * sinon tombe sur la vue générique dans parameters/_generic.
+     */
+    protected function resolveView(string $suffix): string
+    {
+        $specificView = $this->getViewPrefix() . '.' . $suffix;
+        if (View::exists($specificView)) {
+            return $specificView;
+        }
+        return 'parameters._generic.' . $suffix;
+    }
+
+    /**
+     * Données partagées injectées dans toutes les vues de paramètres.
+     */
+    protected function sharedViewData(): array
+    {
+        return [
+            'routePrefix' => $this->getRoutePrefix(),
+            'parameterLabel' => $this->getParameterLabel(),
+            'parameterLabelSingular' => $this->getParameterLabelSingular(),
+        ];
+    }
 
     /**
      * Liste des enregistrements avec recherche et filtrage des archivés.
@@ -43,12 +86,11 @@ abstract class AbstractParameterController extends Controller
 
         $entities = $query->orderBy('ordre_affichage', 'asc')->get();
 
-        return view($this->getViewPrefix() . '.index', [
+        return view($this->resolveView('index'), array_merge($this->sharedViewData(), [
             'entities' => $entities,
             'searchTerm' => $searchTerm,
             'showArchived' => $showArchived,
-            'routePrefix' => $this->getRoutePrefix(),
-        ]);
+        ]));
     }
 
     /**
@@ -56,9 +98,7 @@ abstract class AbstractParameterController extends Controller
      */
     public function create()
     {
-        return view($this->getViewPrefix() . '.create', [
-            'routePrefix' => $this->getRoutePrefix(),
-        ]);
+        return view($this->resolveView('create'), $this->sharedViewData());
     }
 
     /**
@@ -100,10 +140,9 @@ abstract class AbstractParameterController extends Controller
         $modelClass = $this->getModelClass();
         $entity = $modelClass::findOrFail($id);
 
-        return view($this->getViewPrefix() . '.edit', [
+        return view($this->resolveView('edit'), array_merge($this->sharedViewData(), [
             'entity' => $entity,
-            'routePrefix' => $this->getRoutePrefix(),
-        ]);
+        ]));
     }
 
     /**
