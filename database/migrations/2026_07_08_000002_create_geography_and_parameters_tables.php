@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('nom', 255);
             $table->string('code', 50)->nullable()->unique();
             $table->text('description')->nullable();
-            $table->string('slug', 255)->unique();
+            $table->string('slug', 191)->unique();
             $table->integer('ordre_affichage')->default(0);
             $table->string('couleur', 7)->nullable();
             $table->string('icone', 50)->nullable();
@@ -38,7 +38,7 @@ return new class extends Migration
             $table->string('nom', 255);
             $table->string('code', 50)->nullable()->unique();
             $table->text('description')->nullable();
-            $table->string('slug', 255)->unique();
+            $table->string('slug', 191)->unique();
             $table->integer('ordre_affichage')->default(0);
             $table->string('couleur', 7)->nullable();
             $table->string('icone', 50)->nullable();
@@ -59,7 +59,7 @@ return new class extends Migration
             $table->string('nom', 255);
             $table->string('code', 50)->nullable()->unique();
             $table->text('description')->nullable();
-            $table->string('slug', 255)->unique();
+            $table->string('slug', 191)->unique();
             $table->integer('ordre_affichage')->default(0);
             $table->string('couleur', 7)->nullable();
             $table->string('icone', 50)->nullable();
@@ -80,7 +80,7 @@ return new class extends Migration
             $table->string('nom', 255);
             $table->string('code', 50)->nullable()->unique();
             $table->text('description')->nullable();
-            $table->string('slug', 255)->unique();
+            $table->string('slug', 191)->unique();
             $table->integer('ordre_affichage')->default(0);
             $table->boolean('is_active')->default(true);
             $table->boolean('is_default')->default(false);
@@ -98,7 +98,7 @@ return new class extends Migration
             $table->string('nom', 255);
             $table->string('code', 50)->nullable()->unique();
             $table->text('description')->nullable();
-            $table->string('slug', 255)->unique();
+            $table->string('slug', 191)->unique();
             $table->integer('ordre_affichage')->default(0);
             $table->boolean('is_active')->default(true);
             $table->boolean('is_default')->default(false);
@@ -115,7 +115,7 @@ return new class extends Migration
             $table->string('nom', 255);
             $table->string('code', 50)->nullable()->unique();
             $table->text('description')->nullable();
-            $table->string('slug', 255)->unique();
+            $table->string('slug', 191)->unique();
             $table->integer('ordre_affichage')->default(0);
             $table->string('couleur', 7)->nullable();
             $table->string('icone', 50)->nullable();

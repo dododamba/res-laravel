@@ -25,9 +25,9 @@ return new class extends Migration
         // 2. Table des Rôles RBAC
         Schema::create('roles', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name', 255);
-            $table->string('slug', 255)->unique();
-            $table->string('description', 255)->nullable();
+            $table->string('name', 191);
+            $table->string('slug', 191)->unique();
+            $table->string('description', 191)->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
@@ -51,7 +51,7 @@ return new class extends Migration
             $table->string('firstname', 255)->nullable();
             $table->string('lastname', 255)->nullable();
             $table->boolean('is_verified')->default(false);
-            $table->string('slug', 255)->nullable()->unique();
+            $table->string('slug', 191)->nullable()->unique();
             $table->string('telephone', 255)->nullable();
             $table->string('fonction', 255)->nullable();
             $table->string('status', 50)->default('active'); // active, pending, suspended

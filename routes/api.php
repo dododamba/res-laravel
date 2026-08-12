@@ -54,7 +54,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::get('/global-stats', [App\Http\Controllers\Api\v1\MobileDashboardController::class, 'getGlobalStats'])->name('mobile.global-stats');
 
         // -------------------------------------------------------------
-        // REST API Fiscalité Municipale & Recouvrement
+        // REST API Fiscalité Municipale & Recouvrement (legacy)
         // -------------------------------------------------------------
         Route::get('/taxes', [App\Http\Controllers\Api\v1\TaxeApiController::class, 'index']);
         Route::get('/taxes/{id}', [App\Http\Controllers\Api\v1\TaxeApiController::class, 'show']);
@@ -66,6 +66,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::post('/paiements', [App\Http\Controllers\Api\v1\PaiementApiController::class, 'store']);
         Route::post('/paiements/create', [App\Http\Controllers\Api\v1\PaiementApiController::class, 'store']);
 
+        // Legacy endpoint (conservé pour compatibilité)
         Route::get('/operateurs/{id}/taxes', [App\Http\Controllers\Api\v1\OperateurTaxeApiController::class, 'getOperateurTaxes']);
         Route::get('/dashboard/taxes', [App\Http\Controllers\Api\v1\FiscalDashboardApiController::class, 'getDashboardStats']);
         Route::get('/statistiques/taxes', [App\Http\Controllers\Api\v1\FiscalDashboardApiController::class, 'getDashboardStats']);
@@ -75,6 +76,25 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
         Route::get('/exonerations', [App\Http\Controllers\Api\v1\ExonerationApiController::class, 'index']);
         Route::post('/exonerations', [App\Http\Controllers\Api\v1\ExonerationApiController::class, 'store']);
+
+        // -------------------------------------------------------------
+        // COLLECTE FISCALE MOBILE — Endpoints dédiés v2
+        // -------------------------------------------------------------
+        // Situation fiscale d'un opérateur (avec recalcul serveur)
+        Route::get('/operators/{id}/taxes', [App\Http\Controllers\Api\v1\MobileTaxApiController::class, 'getOperateurTaxes'])
+            ->name('mobile.operators.taxes');
+
+        // Enregistrement d'un paiement unique (mode connecté)
+        Route::post('/tax-payments', [App\Http\Controllers\Api\v1\MobileTaxApiController::class, 'store'])
+            ->name('mobile.tax-payments.store');
+
+        // Synchronisation par lots (mode hors-ligne → idempotent)
+        Route::post('/tax-payments/sync', [App\Http\Controllers\Api\v1\MobileTaxApiController::class, 'syncBatch'])
+            ->name('mobile.tax-payments.sync');
+
+        // Tableau de bord KPI fiscal de l'enquêteur
+        Route::get('/mobile/tax-dashboard', [App\Http\Controllers\Api\v1\MobileTaxApiController::class, 'taxDashboard'])
+            ->name('mobile.tax-dashboard');
 
         // Gestion administrative - Rôles ADMIN requis
         Route::prefix('admin')->middleware('admin.api')->group(function () {

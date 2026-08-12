@@ -20,9 +20,14 @@ class PaiementTaxe extends Model implements HasMedia
     protected $guarded = [];
 
     protected $casts = [
-        'date_paiement' => 'datetime',
-        'montant' => 'float',
-        'mode_paiement' => ModePaiement::class,
+        'date_paiement'  => 'datetime',
+        'montant'        => 'float',
+        'mode_paiement'  => ModePaiement::class,
+        // GPS
+        'latitude'       => 'float',
+        'longitude'      => 'float',
+        'altitude'       => 'float',
+        'precision_gps'  => 'float',
     ];
 
     protected static function booted()

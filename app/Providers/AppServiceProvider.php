@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Helpers\ThemeHelper;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -26,6 +27,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Correction de la longueur de clé MySQL pour les versions < 5.7.7
+        // Évite l'erreur "La clé est trop longue" lors des migrations / tests
+        Schema::defaultStringLength(191);
+
         // 1. Partager automatiquement l'instance singleton $theme avec toutes les vues Blade
         View::composer('*', function ($view) {
             $view->with('theme', app(ThemeHelper::class));
