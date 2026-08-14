@@ -86,15 +86,25 @@ class TaxeSeeder extends Seeder
         ];
 
         foreach ($taxes as $taxeData) {
+            $taxeData['date_debut'] = now()->startOfYear();
             $uuid = (string) Str::uuid();
-            Taxe::updateOrCreate(
+            
+            $taxe = Taxe::firstOrCreate(
                 ['code' => $taxeData['code']],
                 array_merge($taxeData, [
                     'id' => $uuid,
                     'uuid' => $uuid,
-                    'date_debut' => now()->startOfYear(),
                 ])
             );
+            
+            // Si la taxe existait déjà, mettre à jour les autres champs sauf l'ID
+            if (!$taxe->wasRecentlyCreated) {
+                $updateData = array_merge($taxeData, [
+                    'updated_at' => now(),
+                ]);
+                unset($updateData['id'], $updateData['uuid']);
+                $taxe->update($updateData);
+            }
         }
     }
 }
