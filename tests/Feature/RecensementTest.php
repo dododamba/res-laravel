@@ -4,9 +4,11 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Models\Recensement;
+use App\Models\Taxe;
 use App\Enums\RecensementStatut;
 use App\Models\Parameters\Quartier;
 use App\Models\Parameters\Carre;
+use App\Models\Parameters\CategorieOperateur;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -131,5 +133,63 @@ class RecensementTest extends TestCase
         // 3. Doit être bloqué par la validation (422 Unprocessable Entity)
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['nombrePersonnes']);
+    }
+
+    public function test_un_operateur_cree_recoit_automatiquement_des_taxes_affectees(): void
+    {
+        $user = User::create([
+            'email' => 'operator@recensement.gov',
+            'password' => 'password123',
+            'firstname' => 'Amina',
+            'lastname' => 'Djim',
+            'is_verified' => true,
+            'is_active' => true,
+        ]);
+
+        $user->roles()->create([
+            'name' => 'Enquêteur',
+            'slug' => 'ROLE_ENQUETEUR',
+        ]);
+
+        $categorie = CategorieOperateur::create([
+            'nom' => 'Commerce de détail',
+            'code' => 'COMMERCE_DETAIL',
+            'description' => 'Boutiques et épiceries',
+            'is_active' => true,
+        ]);
+
+        Taxe::create([
+            'code' => 'PAT-COMM',
+            'nom' => 'Patente Commerciale et Industrielle',
+            'description' => 'Taxe de base',
+            'categorie' => 'Patente Commerciale',
+            'montant' => 50000,
+            'actif' => true,
+            'ordre' => 1,
+        ]);
+
+        $payload = [
+            'nomEntreprise' => 'Boutique Demo',
+            'nomCommercial' => 'Boutique Demo',
+            'categorie_id' => $categorie->id,
+            'telephone' => '77000001',
+            'adresse' => 'Avenue de la Paix',
+            'quartier_id' => null,
+            'carre_id' => null,
+            'rccm' => 'RC-001',
+            'nif' => 'NIF-001',
+        ];
+
+        $response = $this->actingAs($user)
+            ->postJson(route('api.v1.operateurs.create'), $payload);
+
+        $this->assertEquals(201, $response->status(), 'Erreur lors de la création : ' . json_encode($response->json()));
+
+        $operateur = \App\Models\Operateur::where('rccm', 'RC-001')->firstOrFail();
+        $this->assertGreaterThan(0, $operateur->taxesAffectees()->count());
+        $this->assertDatabaseHas('taxe_operateurs', [
+            'operateur_id' => $operateur->id,
+            'taxe_id' => Taxe::where('code', 'PAT-COMM')->first()->id,
+        ]);
     }
 }

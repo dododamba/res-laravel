@@ -8,6 +8,7 @@ use App\Models\Recensement;
 use App\Models\Maison;
 use App\Models\Operateur;
 use App\Models\Parameters\Carre;
+use App\Services\TaxAssignmentService;
 use App\Enums\RecensementStatut;
 use App\Enums\MaisonStatut;
 use App\Enums\OperateurStatut;
@@ -21,6 +22,10 @@ use Exception;
 class SurveyApiController extends Controller
 {
     use ApiResponse; // Fournit buildResponse() et renderData() unifiés
+
+    public function __construct(
+        protected TaxAssignmentService $assignmentService
+    ) {}
 
     /**
      * Endpoint API : Création d'une enquête de Ménage (Recensement)
@@ -190,7 +195,9 @@ class SurveyApiController extends Controller
             $op->id = $data['uuid'] ?? (string) Str::uuid();
             $op->uuid = $op->id;
             $op->nom_entreprise = $data['nomEntreprise'] ?? $data['nom_entreprise'] ?? 'ENT-MOB-' . uniqid();
-            $op->nom_commercial = $op->nom_entreprise;
+            $op->nom_commercial = $data['nomCommercial'] ?? $data['nom_commercial'] ?? $op->nom_entreprise;
+            $op->rccm = $data['rccm'] ?? null;
+            $op->nif = $data['nif'] ?? null;
             $tableFields = ['adresse', 'telephone', 'gps_latitude', 'gps_longitude'];
             foreach ($tableFields as $field) {
                 if (isset($data[$field])) {
@@ -199,6 +206,7 @@ class SurveyApiController extends Controller
             }
             $op->statut = OperateurStatut::SOUMIS;
 
+            $op->categorie_id = $data['categorie_id'] ?? $data['categorieId'] ?? null;
             $op->carre_id = $data['carre_id'] ?? $data['carreId'] ?? null;
             $op->quartier_id = $data['quartier_id'] ?? $data['quartierId'] ?? null;
             if (empty($op->carre_id)) {
@@ -237,6 +245,10 @@ class SurveyApiController extends Controller
             }
 
             $op->save();
+
+            if ($op->categorie_id) {
+                $this->assignmentService->autoAssignTaxesForOperateur($op);
+            }
 
             return $this->buildResponse(
                 success: true,

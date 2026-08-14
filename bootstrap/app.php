@@ -1,5 +1,7 @@
 <?php
 
+require __DIR__ . '/mb-polyfill.php';
+
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
