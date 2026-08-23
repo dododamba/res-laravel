@@ -18,6 +18,7 @@ trait ApiResponse
         array $meta = []
     ): JsonResponse {
         return response()->json([
+            'success' => $success,
             'status' => $success ? 'success' : 'error',
             'message' => $message,
             'data' => $data,

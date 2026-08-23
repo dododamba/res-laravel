@@ -54,8 +54,8 @@ class TaxPaymentService
                 }
             }
 
-            // ─── Chargement de la taxe assignée à l'opérateur ────────────────
-            $taxeOp = TaxeOperateur::with(['operateur', 'taxe'])->findOrFail($data['taxe_operateur_id']);
+            // ─── Chargement de la taxe assignée à l'opérateur avec verrou pessimiste (concurrence) ──
+            $taxeOp = TaxeOperateur::with(['operateur', 'taxe'])->lockForUpdate()->findOrFail($data['taxe_operateur_id']);
 
             // Règle : une taxe déjà soldée ne peut être payée de nouveau
             if ($taxeOp->statut === TaxeStatut::SOLDE) {
@@ -101,6 +101,13 @@ class TaxPaymentService
 
             $uuid = $clientUuid ?: (string) Str::uuid();
 
+            $lat  = $data['latitude'] ?? $data['gps_latitude'] ?? null;
+            $lng  = $data['longitude'] ?? $data['gps_longitude'] ?? null;
+            $acc  = $data['precision_gps'] ?? $data['gps_accuracy'] ?? null;
+            $alt  = $data['altitude'] ?? $data['gps_altitude'] ?? null;
+            $per  = $data['periode_fiscale'] ?? $data['periode'] ?? date('Y');
+            $dev  = $data['device_id'] ?? null;
+
             // ─── Création du paiement ─────────────────────────────────────────
             $paiement = PaiementTaxe::create([
                 'id'              => $uuid,
@@ -117,13 +124,13 @@ class TaxPaymentService
                 'signature_agent' => $data['signature_agent'] ?? null,
                 'signature_client' => $data['signature_client'] ?? null,
                 'statut'          => 'valide',
-                // Champs GPS (depuis la migration 2026_08_10_000001)
-                'latitude'        => $data['latitude'] ?? null,
-                'longitude'       => $data['longitude'] ?? null,
-                'altitude'        => $data['altitude'] ?? null,
-                'precision_gps'   => $data['precision_gps'] ?? null,
-                'periode_fiscale' => $data['periode_fiscale'] ?? date('Y'),
-                'device_id'       => $data['device_id'] ?? null,
+                // Champs GPS & Période (nommage officiel base de données)
+                'gps_latitude'    => $lat,
+                'gps_longitude'   => $lng,
+                'gps_altitude'    => $alt,
+                'gps_accuracy'    => $acc,
+                'periode'         => $per,
+                'device_id'       => $dev,
             ]);
 
             // ─── Justificatif base64 (photo de reçu papier) ──────────────────
@@ -207,10 +214,10 @@ class TaxPaymentService
      * Traite un lot de paiements en attente (sync batch depuis le mobile).
      *
      * @param  array  $payments  Tableau de données de paiements
-     * @param  int|null $userId
+     * @param  string|null $userId
      * @return array  ['synced' => [...], 'errors' => [...]]
      */
-    public function processBatch(array $payments, ?int $userId = null): array
+    public function processBatch(array $payments, ?string $userId = null): array
     {
         $synced = [];
         $errors = [];

@@ -74,4 +74,17 @@ class Agent extends Model
     {
         return $this->hasMany(Affectation::class, 'agent_id');
     }
+
+    /**
+     * Les affectations géographiques encore actives de l'agent.
+     */
+    public function affectationsActives()
+    {
+        return $this->hasMany(Affectation::class, 'agent_id')
+            ->where('statut', 'Active')
+            ->where(function ($q) {
+                $q->whereNull('date_fin')
+                  ->orWhere('date_fin', '>=', now());
+            });
+    }
 }

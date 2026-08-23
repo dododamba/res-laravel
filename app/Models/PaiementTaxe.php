@@ -24,11 +24,26 @@ class PaiementTaxe extends Model implements HasMedia
         'montant'        => 'float',
         'mode_paiement'  => ModePaiement::class,
         // GPS
-        'latitude'       => 'float',
-        'longitude'      => 'float',
-        'altitude'       => 'float',
-        'precision_gps'  => 'float',
+        'gps_latitude'   => 'float',
+        'gps_longitude'  => 'float',
+        'gps_altitude'   => 'float',
+        'gps_accuracy'   => 'float',
     ];
+
+    public function getLatitudeAttribute() { return $this->gps_latitude; }
+    public function setLatitudeAttribute($val) { $this->attributes['gps_latitude'] = $val; }
+
+    public function getLongitudeAttribute() { return $this->gps_longitude; }
+    public function setLongitudeAttribute($val) { $this->attributes['gps_longitude'] = $val; }
+
+    public function getAltitudeAttribute() { return $this->gps_altitude; }
+    public function setAltitudeAttribute($val) { $this->attributes['gps_altitude'] = $val; }
+
+    public function getPrecisionGpsAttribute() { return $this->gps_accuracy; }
+    public function setPrecisionGpsAttribute($val) { $this->attributes['gps_accuracy'] = $val; }
+
+    public function getPeriodeFiscaleAttribute() { return $this->periode; }
+    public function setPeriodeFiscaleAttribute($val) { $this->attributes['periode'] = $val; }
 
     protected static function booted()
     {

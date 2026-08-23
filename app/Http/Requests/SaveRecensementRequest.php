@@ -9,7 +9,11 @@ class SaveRecensementRequest extends FormRequest
     public function authorize(): bool
     {
         // Seuls les enquêteurs et les admins ont l'autorisation de soumettre un recensement
-        return auth()->check() && auth()->user()->hasRole(['ROLE_ENQUETEUR', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN']);
+        return auth()->check() && auth()->user()->hasRole([
+            'ROLE_ENQUETEUR', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 
+            'Enquêteur', 'Administrateur', 'Super Administrateur',
+            'enqueteur', 'administrateur'
+        ]);
     }
 
     public function rules(): array

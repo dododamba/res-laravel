@@ -13,6 +13,7 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Enums\TaxeStatut;
 use Exception;
 
 /**
@@ -44,6 +45,23 @@ class MobileTaxApiController extends Controller
             $operateur = Operateur::where('id', $id)
                 ->orWhere('uuid', $id)
                 ->firstOrFail();
+
+            // Vérification de sécurité : l'agent doit être affecté dans le quartier de l'opérateur
+            if (auth()->check()) {
+                $user = auth()->user();
+                if ($user->agent) {
+                    $affectation = $user->agent->affectationsActives()
+                        ->where('quartier_id', $operateur->quartier_id)
+                        ->first();
+                    if (!$affectation) {
+                        return $this->buildResponse(
+                            success: false,
+                            message: "Accès non autorisé : cet opérateur n'est pas dans votre zone d'affectation.",
+                            statusCode: 403
+                        );
+                    }
+                }
+            }
 
             // Auto-affectation si aucune taxe n'existe encore
             if ($operateur->taxesAffectees()->count() === 0) {
@@ -261,13 +279,13 @@ class MobileTaxApiController extends Controller
             if (!empty($quartierIds)) {
                 $operateursRecouvres = \App\Models\TaxeOperateur::query()
                     ->whereHas('operateur', fn($q) => $q->whereIn('quartier_id', $quartierIds))
-                    ->where('statut', 'SOLDE')
+                    ->where('statut', TaxeStatut::SOLDE)
                     ->whereYear('updated_at', $annee)
                     ->count();
 
                 $operateursEnRetard = \App\Models\TaxeOperateur::query()
                     ->whereHas('operateur', fn($q) => $q->whereIn('quartier_id', $quartierIds))
-                    ->where('statut', 'EN_RETARD')
+                    ->where('statut', TaxeStatut::EN_RETARD)
                     ->count();
             }
 

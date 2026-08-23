@@ -114,6 +114,12 @@ class User extends Authenticatable
             return false;
         }
 
-        return $this->roles()->where('slug', $roles)->exists();
+        return $this->roles()->where(function ($q) use ($roles) {
+            $slugified = Str::slug($roles);
+            $q->where('slug', $roles)
+              ->orWhere('name', $roles)
+              ->orWhere('slug', $slugified)
+              ->orWhere('name', 'like', "%{$roles}%");
+        })->exists();
     }
 }
