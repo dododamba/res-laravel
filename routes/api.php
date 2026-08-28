@@ -53,6 +53,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::get('/assignments', [App\Http\Controllers\Api\v1\MobileDashboardController::class, 'getAssignments'])->name('mobile.assignments');
         Route::get('/global-stats', [App\Http\Controllers\Api\v1\MobileDashboardController::class, 'getGlobalStats'])->name('mobile.global-stats');
 
+        // Endpoint de recherche globale multi-critères
+        Route::get('/search', [App\Http\Controllers\Api\v1\SearchApiController::class, 'search'])->name('mobile.search');
+
         // -------------------------------------------------------------
         // REST API Fiscalité Municipale & Recouvrement (legacy)
         // -------------------------------------------------------------
