@@ -2,6 +2,7 @@
 
 namespace App\Models\Scopes;
 
+use App\Services\AgentScopeService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
@@ -14,16 +15,8 @@ class UserRecordFilterScope implements Scope
             return;
         }
 
-        $user = auth()->user();
-
-        if ($user->hasRole(['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])) {
-            return;
-        }
-
-        if ($user->agent) {
-            $builder->where('enqueteur_id', $user->agent->id);
-        } else {
-            $builder->whereRaw('1 = 0');
-        }
+        $scopeService = app(AgentScopeService::class);
+        $scopeService->applyScope($builder, get_class($model));
     }
 }
+

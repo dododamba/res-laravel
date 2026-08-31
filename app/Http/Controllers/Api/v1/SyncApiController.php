@@ -12,9 +12,18 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
+use App\Services\AgentScopeService;
+
 class SyncApiController extends Controller
 {
     use ApiResponse; // Fournit buildResponse()
+
+    protected AgentScopeService $scopeService;
+
+    public function __construct(AgentScopeService $scopeService)
+    {
+        $this->scopeService = $scopeService;
+    }
 
     /**
      * API Endpoint : PUSH (Réception de paquets d'enquêtes hors-ligne collectées sur le terrain)
@@ -384,11 +393,9 @@ class SyncApiController extends Controller
         $maisonsQuery = Maison::where('updated_at', '>=', $lastSync);
         $operateursQuery = Operateur::where('updated_at', '>=', $lastSync);
 
-        if (!$isAdmin) {
-            $recensementsQuery->where('enqueteur_id', $agentId);
-            $maisonsQuery->where('enqueteur_id', $agentId);
-            $operateursQuery->where('enqueteur_id', $agentId);
-        }
+        $this->scopeService->applyScope($recensementsQuery, Recensement::class, $user);
+        $this->scopeService->applyScope($maisonsQuery, Maison::class, $user);
+        $this->scopeService->applyScope($operateursQuery, Operateur::class, $user);
 
         $recensements = $recensementsQuery->get();
         $maisons = $maisonsQuery->get();

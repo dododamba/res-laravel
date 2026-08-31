@@ -52,6 +52,12 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Api\v1\MobileDashboardController::class, 'getDashboard'])->name('mobile.dashboard');
         Route::get('/assignments', [App\Http\Controllers\Api\v1\MobileDashboardController::class, 'getAssignments'])->name('mobile.assignments');
         Route::get('/global-stats', [App\Http\Controllers\Api\v1\MobileDashboardController::class, 'getGlobalStats'])->name('mobile.global-stats');
+        Route::get('/statistics/global', [App\Http\Controllers\Api\v1\MobileDashboardController::class, 'getGlobalStats'])->name('mobile.statistics.global');
+        Route::get('/dashboard/statistics', [App\Http\Controllers\Api\v1\MobileDashboardController::class, 'getStatistics'])->name('mobile.dashboard.statistics');
+        Route::get('/statistics/by-quartier', [App\Http\Controllers\Api\v1\MobileDashboardController::class, 'getStatistics'])->name('mobile.statistics.by-quartier');
+        Route::get('/statistics/quartiers', [App\Http\Controllers\Api\v1\MobileDashboardController::class, 'getStatistics'])->name('mobile.statistics.quartiers');
+        Route::get('/statistics/quartiers/{quartier}/carres', [App\Http\Controllers\Api\v1\MobileDashboardController::class, 'getCarreStatistics'])->name('mobile.statistics.quartier.carres');
+        Route::get('/statistics/carres', [App\Http\Controllers\Api\v1\MobileDashboardController::class, 'getCarreStatistics'])->name('mobile.statistics.carres');
 
         // Endpoint de recherche globale multi-critères
         Route::get('/search', [App\Http\Controllers\Api\v1\SearchApiController::class, 'search'])->name('mobile.search');

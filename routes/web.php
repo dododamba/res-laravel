@@ -31,8 +31,10 @@ Route::middleware(['auth', 'middleware' => App\Http\Middleware\ThemeLayoutMiddle
     // Déconnexion
     Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 
-    // Tableau de bord global
+    // Tableau de bord global & Statistiques territoriales hiérarchiques
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/statistics', [App\Http\Controllers\StatisticsController::class, 'index'])->name('statistics.index');
+    Route::get('/statistics/quartiers/{quartier}/carres', [App\Http\Controllers\StatisticsController::class, 'carres'])->name('statistics.carres');
 
     // Profil utilisateur & Paramètres du compte
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');

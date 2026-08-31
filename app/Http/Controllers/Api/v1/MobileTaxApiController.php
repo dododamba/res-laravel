@@ -25,6 +25,8 @@ use Exception;
  *   POST /api/v1/tax-payments/sync          → Synchroniser un lot hors-ligne
  *   GET  /api/v1/mobile/tax-dashboard       → KPIs fiscaux de l'enquêteur
  */
+use App\Services\AgentScopeService;
+
 class MobileTaxApiController extends Controller
 {
     use ApiResponse;
@@ -32,7 +34,8 @@ class MobileTaxApiController extends Controller
     public function __construct(
         protected TaxPaymentService     $taxPaymentService,
         protected TaxAssignmentService  $assignmentService,
-        protected TaxCalculationService $calculationService
+        protected TaxCalculationService $calculationService,
+        protected AgentScopeService     $scopeService
     ) {}
 
     // =========================================================================
@@ -46,21 +49,13 @@ class MobileTaxApiController extends Controller
                 ->orWhere('uuid', $id)
                 ->firstOrFail();
 
-            // Vérification de sécurité : l'agent doit être affecté dans le quartier de l'opérateur
-            if (auth()->check()) {
-                $user = auth()->user();
-                if ($user->agent) {
-                    $affectation = $user->agent->affectationsActives()
-                        ->where('quartier_id', $operateur->quartier_id)
-                        ->first();
-                    if (!$affectation) {
-                        return $this->buildResponse(
-                            success: false,
-                            message: "Accès non autorisé : cet opérateur n'est pas dans votre zone d'affectation.",
-                            statusCode: 403
-                        );
-                    }
-                }
+            // Vérification de sécurité : l'agent doit avoir le quartier de l'opérateur dans son périmètre
+            if (!$this->scopeService->canAccessQuartier($operateur->quartier_id)) {
+                return $this->buildResponse(
+                    success: false,
+                    message: "Accès non autorisé : cet opérateur n'est pas dans votre zone d'affectation.",
+                    statusCode: 403
+                );
             }
 
             // Auto-affectation si aucune taxe n'existe encore
@@ -243,16 +238,13 @@ class MobileTaxApiController extends Controller
     {
         try {
             $user  = auth()->user();
-            $agent = $user?->agent;
+            $agent = $this->scopeService->getCurrentAgent($user);
 
-            // Zone d'affectation active
+            // Zone d'affectation active via AgentScopeService
+            $quartierIds = $this->scopeService->getAuthorizedQuartierIds($user) ?: [];
             $affectation = null;
-            $quartierIds = [];
             if ($agent) {
                 $affectation = $agent->affectationsActives()->with(['quartier', 'campagne'])->first();
-                if ($affectation) {
-                    $quartierIds = [$affectation->quartier_id];
-                }
             }
 
             // Période fiscale (défaut = année courante)

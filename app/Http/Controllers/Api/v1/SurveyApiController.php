@@ -19,12 +19,15 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Exception;
 
+use App\Services\AgentScopeService;
+
 class SurveyApiController extends Controller
 {
     use ApiResponse; // Fournit buildResponse() et renderData() unifiés
 
     public function __construct(
-        protected TaxAssignmentService $assignmentService
+        protected TaxAssignmentService $assignmentService,
+        protected AgentScopeService $scopeService
     ) {}
 
     /**
@@ -34,6 +37,15 @@ class SurveyApiController extends Controller
     {
         try {
             $validated = $request->validated();
+
+            $quartierId = $validated['quartier_id'] ?? $validated['quartierId'] ?? null;
+            if ($quartierId && !$this->scopeService->canAccessQuartier($quartierId)) {
+                return $this->buildResponse(
+                    success: false,
+                    message: "Accès refusé : Vous n'êtes pas autorisé à enregistrer des données pour ce quartier.",
+                    statusCode: 403
+                );
+            }
 
             $rec = DB::transaction(function () use ($validated) {
                 $recensement = new Recensement();
@@ -143,6 +155,14 @@ class SurveyApiController extends Controller
                 $maison->carre_id = $data['carre_id'];
             }
 
+            if ($maison->carre_id && !$this->scopeService->canAccessCarre($maison->carre_id)) {
+                return $this->buildResponse(
+                    success: false,
+                    message: "Accès refusé : Vous n'êtes pas autorisé à enregistrer une habitation dans ce carré.",
+                    statusCode: 403
+                );
+            }
+
             if (auth()->check() && auth()->user()->agent) {
                 $maison->enqueteur_id = auth()->user()->agent->id;
             }
@@ -215,6 +235,14 @@ class SurveyApiController extends Controller
                     $op->carre_id = $defaultCarre->id;
                     $op->quartier_id = $defaultCarre->quartier_id;
                 }
+            }
+
+            if ($op->quartier_id && !$this->scopeService->canAccessQuartier($op->quartier_id)) {
+                return $this->buildResponse(
+                    success: false,
+                    message: "Accès refusé : Vous n'êtes pas autorisé à enregistrer un opérateur dans ce quartier.",
+                    statusCode: 403
+                );
             }
 
             // Check duplicate: Règle 3 & 4 : RCCM & NIF Uniqueness, Règle 5 : raison sociale / nom commercial in campaign

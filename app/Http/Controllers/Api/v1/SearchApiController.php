@@ -10,9 +10,18 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
+use App\Services\AgentScopeService;
+
 class SearchApiController extends Controller
 {
     use ApiResponse;
+
+    protected AgentScopeService $scopeService;
+
+    public function __construct(AgentScopeService $scopeService)
+    {
+        $this->scopeService = $scopeService;
+    }
 
     /**
      * Endpoint de recherche globale multi-critères (/api/v1/search)
@@ -26,6 +35,23 @@ class SearchApiController extends Controller
         $statut = $request->input('statut');
         $page = (int) $request->input('page', 1);
         $perPage = (int) $request->input('per_page', 15);
+
+        // RÈGLE DE SÉCURITÉ : Vérifier l'habilitation de l'agent si un quartier est explicitement demandé
+        if ($quartierId && !$this->scopeService->canAccessQuartier($quartierId)) {
+            return $this->buildResponse(
+                success: false,
+                message: "Accès refusé : Le quartier demandé ne fait pas partie de votre périmètre d'affectation.",
+                statusCode: 403
+            );
+        }
+
+        if ($carreId && !$this->scopeService->canAccessCarre($carreId)) {
+            return $this->buildResponse(
+                success: false,
+                message: "Accès refusé : Le carré demandé ne fait pas partie de votre périmètre d'affectation.",
+                statusCode: 403
+            );
+        }
 
         $results = [];
 

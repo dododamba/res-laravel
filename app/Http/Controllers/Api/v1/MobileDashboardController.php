@@ -6,15 +6,28 @@ use App\Http\Controllers\Controller;
 use App\Models\Recensement;
 use App\Models\Maison;
 use App\Models\Operateur;
+use App\Models\PaiementTaxe;
 use App\Models\Affectation;
+use App\Models\Parameters\Quartier;
+use App\Services\AgentScopeService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Carbon\Carbon;
+use DB;
 
 class MobileDashboardController extends Controller
 {
     use ApiResponse;
+
+    protected AgentScopeService $scopeService;
+    protected \App\Services\StatisticsService $statsService;
+
+    public function __construct(AgentScopeService $scopeService, \App\Services\StatisticsService $statsService)
+    {
+        $this->scopeService = $scopeService;
+        $this->statsService = $statsService;
+    }
 
     /**
      * Endpoint API : Indicateurs de pilotage dynamiques (Mobile / Web API)
@@ -22,78 +35,64 @@ class MobileDashboardController extends Controller
     public function getDashboard(Request $request): JsonResponse
     {
         $user = auth()->user();
-        $isAdmin = $user->hasRole(['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']);
-        $agent = $user->agent;
-        $agentId = $agent ? $agent->id : null;
+        $isAdmin = $this->scopeService->isAdmin($user);
 
-        // 1. Calcul des indicateurs clés réels (global pour les admins, cloisonné pour les enquêteurs)
-        if ($isAdmin) {
-            $menagesCount = Recensement::count();
-            $habitatsCount = Maison::count();
-            $operateursCount = Operateur::count();
-        } else {
-            $menagesCount = $agentId ? Recensement::where('enqueteur_id', $agentId)->count() : 0;
-            $habitatsCount = $agentId ? Maison::where('enqueteur_id', $agentId)->count() : 0;
-            $operateursCount = $agentId ? Operateur::where('enqueteur_id', $agentId)->count() : 0;
-        }
+        // 1. Calcul des indicateurs clés réels cloisonnés par le scope géographique
+        $menagesQuery = Recensement::query();
+        $habitatsQuery = Maison::query();
+        $operateursQuery = Operateur::query();
 
-        // 2. Génération d'une Timeline d'activités strictement dynamique basée sur les dernières saisies
+        $this->scopeService->applyScope($menagesQuery, Recensement::class, $user);
+        $this->scopeService->applyScope($habitatsQuery, Maison::class, $user);
+        $this->scopeService->applyScope($operateursQuery, Operateur::class, $user);
+
+        $menagesCount = $menagesQuery->count();
+        $habitatsCount = $habitatsQuery->count();
+        $operateursCount = $operateursQuery->count();
+
+        // 2. Génération d'une Timeline d'activités dynamique basée sur le scope
         $activities = [];
 
-        if ($isAdmin || $agentId) {
-            // Derniers recensements (ménages)
-            $recensementsQuery = Recensement::orderBy('created_at', 'desc')->limit(5);
-            if (!$isAdmin) {
-                $recensementsQuery->where('enqueteur_id', $agentId);
-            }
-            $recensements = $recensementsQuery->get();
+        // Derniers recensements (ménages)
+        $recensementsQuery = Recensement::orderBy('created_at', 'desc')->limit(5);
+        $this->scopeService->applyScope($recensementsQuery, Recensement::class, $user);
+        foreach ($recensementsQuery->get() as $r) {
+            $activities[] = [
+                'id' => 'recensement_' . $r->id,
+                'title' => 'Enquête Ménage',
+                'description' => "Recensement de la famille de Chef {$r->chef_prenom} {$r->chef_nom}",
+                'timestamp' => $r->created_at ? $r->created_at->format('Y-m-d H:i:s') : now()->toDateTimeString(),
+                'type' => 'menage',
+                'status' => 'success',
+            ];
+        }
 
-            foreach ($recensements as $r) {
-                $activities[] = [
-                    'id' => 'recensement_' . $r->id,
-                    'title' => 'Enquête Ménage',
-                    'description' => "Recensement de la famille de Chef {$r->chef_prenom} {$r->chef_nom}",
-                    'timestamp' => $r->created_at->format('Y-m-d H:i:s'),
-                    'type' => 'menage',
-                    'status' => 'success',
-                ];
-            }
+        // Dernières habitations (maisons)
+        $maisonsQuery = Maison::orderBy('created_at', 'desc')->limit(5);
+        $this->scopeService->applyScope($maisonsQuery, Maison::class, $user);
+        foreach ($maisonsQuery->get() as $m) {
+            $activities[] = [
+                'id' => 'maison_' . $m->id,
+                'title' => 'Enquête Habitation',
+                'description' => "Saisie de l'Habitation n°{$m->numero_porte} ({$m->adresse})",
+                'timestamp' => $m->created_at ? $m->created_at->format('Y-m-d H:i:s') : now()->toDateTimeString(),
+                'type' => 'maison',
+                'status' => 'success',
+            ];
+        }
 
-            // Dernières habitations (maisons)
-            $maisonsQuery = Maison::orderBy('created_at', 'desc')->limit(5);
-            if (!$isAdmin) {
-                $maisonsQuery->where('enqueteur_id', $agentId);
-            }
-            $maisons = $maisonsQuery->get();
-
-            foreach ($maisons as $m) {
-                $activities[] = [
-                    'id' => 'maison_' . $m->id,
-                    'title' => 'Enquête Habitation',
-                    'description' => "Saisie de l'Habitation n°{$m->numero_porte} ({$m->adresse})",
-                    'timestamp' => $m->created_at->format('Y-m-d H:i:s'),
-                    'type' => 'maison',
-                    'status' => 'success',
-                ];
-            }
-
-            // Derniers opérateurs (commerces)
-            $operateursQuery = Operateur::orderBy('created_at', 'desc')->limit(5);
-            if (!$isAdmin) {
-                $operateursQuery->where('enqueteur_id', $agentId);
-            }
-            $operateurs = $operateursQuery->get();
-
-            foreach ($operateurs as $o) {
-                $activities[] = [
-                    'id' => 'operateur_' . $o->id,
-                    'title' => 'Opérateur Économique',
-                    'description' => "Enregistrement du commerce " . ($o->nom_commercial ?: $o->nom_entreprise ?: 'Inconnu'),
-                    'timestamp' => $o->created_at->format('Y-m-d H:i:s'),
-                    'type' => 'operateur',
-                    'status' => 'success',
-                ];
-            }
+        // Derniers opérateurs (commerces)
+        $operateursQueryList = Operateur::orderBy('created_at', 'desc')->limit(5);
+        $this->scopeService->applyScope($operateursQueryList, Operateur::class, $user);
+        foreach ($operateursQueryList->get() as $o) {
+            $activities[] = [
+                'id' => 'operateur_' . $o->id,
+                'title' => 'Opérateur Économique',
+                'description' => "Enregistrement du commerce " . ($o->nom_commercial ?: $o->nom_entreprise ?: 'Inconnu'),
+                'timestamp' => $o->created_at ? $o->created_at->format('Y-m-d H:i:s') : now()->toDateTimeString(),
+                'type' => 'operateur',
+                'status' => 'success',
+            ];
         }
 
         // Tri combiné descendant par date de création
@@ -101,7 +100,6 @@ class MobileDashboardController extends Controller
             return strcmp($b['timestamp'], $a['timestamp']);
         });
 
-        // Limiter aux 8 activités récentes les plus pertinentes
         $recentActivity = array_slice($activities, 0, 8);
 
         return $this->buildResponse(
@@ -119,12 +117,12 @@ class MobileDashboardController extends Controller
     }
 
     /**
-     * Endpoint API : Liste historique et active des affectations de terrain (Secteurs de l'Agent)
+     * Endpoint API : Liste des affectations actives
      */
     public function getAssignments(Request $request): JsonResponse
     {
         $user = auth()->user();
-        $agent = $user->agent;
+        $agent = $this->scopeService->getCurrentAgent($user);
 
         if (!$agent) {
             return $this->buildResponse(
@@ -134,28 +132,17 @@ class MobileDashboardController extends Controller
             );
         }
 
-        // Récupération des affectations actives
-        $affectations = Affectation::with(['quartier', 'carre.chef_carre.personne'])
-            ->where('agent_id', $agent->id)
-            ->where('statut', 'actif')
-            ->get();
+        $affectations = $this->scopeService->getActiveAssignments($user);
 
         $mapped = [];
         foreach ($affectations as $aff) {
-            
-            // Calcul des fiches réalisées sur cette affectation précise
             $realisedCount = 0;
             if ($aff->quartier_id) {
-                $realisedCount = Recensement::where('enqueteur_id', $agent->id)
-                    ->where('quartier_id', $aff->quartier_id)
-                    ->count();
+                $realisedCount = Recensement::where('quartier_id', $aff->quartier_id)->count();
             } elseif ($aff->carre_id) {
-                $realisedCount = Recensement::where('enqueteur_id', $agent->id)
-                    ->where('carre_id', $aff->carre_id)
-                    ->count();
+                $realisedCount = Recensement::where('carre_id', $aff->carre_id)->count();
             }
 
-            // Informations du superviseur (Chef de Carré)
             $chefDeCarre = null;
             $telChefDeCarre = null;
             if ($aff->carre && $aff->carre->chef_carre) {
@@ -182,14 +169,14 @@ class MobileDashboardController extends Controller
                     'nom' => $aff->carre->nom,
                 ] : null,
                 'secteurs' => [],
-                'responsable' => trim("{$agent->personne->prenom} {$agent->personne->nom}"),
-                'telephoneResponsable' => $agent->personne->telephone,
+                'responsable' => $agent->personne ? trim("{$agent->personne->prenom} {$agent->personne->nom}") : 'Agent',
+                'telephoneResponsable' => $agent->personne ? $agent->personne->telephone : '',
                 'chefDeCarre' => $chefDeCarre,
                 'telephoneChefDeCarre' => $telChefDeCarre,
                 'dateDebut' => $aff->date_debut ? Carbon::parse($aff->date_debut)->toDateString() : '2026-06-01',
                 'dateFin' => $aff->date_fin ? Carbon::parse($aff->date_fin)->toDateString() : '2026-07-31',
                 'statut' => 'Active',
-                'fichesAttribuees' => 100, // Objectif par défaut
+                'fichesAttribuees' => 100,
                 'fichesRealisees' => $realisedCount,
             ];
         }
@@ -202,60 +189,108 @@ class MobileDashboardController extends Controller
     }
 
     /**
-     * Endpoint API : Statistiques démographiques globales
+     * Endpoint API : Statistiques démographiques globales (Niveau 1)
      */
     public function getGlobalStats(Request $request): JsonResponse
     {
-        // Agrégations démographiques globales optimisées
-        $menagesAgreges = Recensement::query()
-            ->selectRaw('
-                COUNT(id) as total_menages,
-                SUM(nombre_personnes) as total_population,
-                SUM(nombre_hommes) as total_hommes,
-                SUM(nombre_femmes) as total_femmes,
-                SUM(nombre_enfants) as total_enfants,
-                SUM(nombre_jeunes) as total_jeunes,
-                SUM(nombre_handicapes) as total_handicapes,
-                SUM(instruction_aucun) as instruction_aucun,
-                SUM(instruction_primaire) as instruction_primaire,
-                SUM(instruction_secondaire) as instruction_secondaire,
-                SUM(instruction_superieur) as instruction_superieur
-            ')
-            ->first();
-
-        $totalHabitations = Maison::count();
-        $totalEntreprises = Operateur::count();
-
-        $totalPop = (int)($menagesAgreges->total_population ?? 0);
-        $hommeRatio = 0;
-        $femmeRatio = 0;
-        if ($totalPop > 0) {
-            $hommeRatio = round((($menagesAgreges->total_hommes ?? 0) / $totalPop) * 100, 1);
-            $femmeRatio = round((($menagesAgreges->total_femmes ?? 0) / $totalPop) * 100, 1);
-        }
-
-        $stats = [
-            'total_menages' => (int)($menagesAgreges->total_menages ?? 0),
-            'total_population' => $totalPop,
-            'total_hommes' => (int)($menagesAgreges->total_hommes ?? 0),
-            'total_femmes' => (int)($menagesAgreges->total_femmes ?? 0),
-            'total_enfants' => (int)($menagesAgreges->total_enfants ?? 0),
-            'total_jeunes' => (int)($menagesAgreges->total_jeunes ?? 0),
-            'total_handicapes' => (int)($menagesAgreges->total_handicapes ?? 0),
-            'instruction_aucun' => (int)($menagesAgreges->instruction_aucun ?? 0),
-            'instruction_primaire' => (int)($menagesAgreges->instruction_primaire ?? 0),
-            'instruction_secondaire' => (int)($menagesAgreges->instruction_secondaire ?? 0),
-            'instruction_superieur' => (int)($menagesAgreges->instruction_superieur ?? 0),
-            'total_habitations' => $totalHabitations,
-            'total_entreprises' => $totalEntreprises,
-            'homme_ratio' => $hommeRatio,
-            'femme_ratio' => $femmeRatio,
-        ];
+        $user = auth()->user();
+        $stats = $this->statsService->getGlobalStats($user);
 
         return $this->buildResponse(
             success: true,
             message: "Statistiques globales récupérées avec succès.",
             data: $stats
+        );
+    }
+
+    /**
+     * Endpoint API : Statistiques Détaillées par Quartier (Niveau 2)
+     * (GET /api/v1/dashboard/statistics, GET /api/v1/statistics/by-quartier, GET /api/v1/statistics/quartiers)
+     */
+    public function getStatistics(Request $request): JsonResponse
+    {
+        $user = auth()->user();
+        $requestedQuartierId = $request->input('quartier_id');
+
+        try {
+            $data = $this->statsService->getQuartierStats($user, $requestedQuartierId ? (string)$requestedQuartierId : null);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return $this->buildResponse(
+                success: false,
+                message: $e->getMessage(),
+                statusCode: 403
+            );
+        }
+
+        // Structural adaptation to preserve backward compatibility for byQuartier & scope payload
+        $data['scope'] = [
+            'type' => $this->scopeService->isAdmin($user) ? 'global' : 'quartier',
+            'quartiers' => array_map(fn($item) => ['id' => $item['id'], 'nom' => $item['nom']], $data['items']),
+        ];
+
+        $data['byQuartier'] = array_map(function ($item) {
+            return array_merge($item, [
+                'quartier_id' => (string) $item['id'],
+                'quartier_nom' => $item['nom'],
+                'taxes_encaissees' => $item['paiements'],
+                'montant_encaisse' => $item['montantEncaisse'],
+                'fiches_synchronisees' => $item['fiches_validees'],
+            ]);
+        }, $data['items']);
+
+        return $this->buildResponse(
+            success: true,
+            message: "Statistiques par quartier récupérées avec succès.",
+            data: $data
+        );
+    }
+
+    /**
+     * Endpoint API : Statistiques Détaillées par Carré (Niveau 3)
+     * (GET /api/v1/statistics/quartiers/{quartier}/carres, GET /api/v1/statistics/carres)
+     */
+    public function getCarreStatistics(Request $request, $quartier = null): JsonResponse
+    {
+        $user = auth()->user();
+        
+        if ($quartier instanceof \App\Models\Parameters\Quartier) {
+            $qId = (string) $quartier->id;
+        } elseif (!empty($quartier)) {
+            $qId = (string) $quartier;
+        } else {
+            $qId = $request->input('quartier_id') ? (string) $request->input('quartier_id') : null;
+        }
+
+        $cId = $request->input('carre_id') ? (string) $request->input('carre_id') : null;
+
+        if (!$qId) {
+            return $this->buildResponse(
+                success: false,
+                message: "Le paramètre quartier_id est obligatoire pour consulter les carrés.",
+                statusCode: 422
+            );
+        }
+
+        try {
+            $data = $this->statsService->getCarreStats($qId, $user, $cId);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return $this->buildResponse(
+                success: false,
+                message: $e->getMessage(),
+                statusCode: 403
+            );
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->buildResponse(
+                success: false,
+                message: "Quartier introuvable.",
+                statusCode: 404
+            );
+        }
+
+        return $this->buildResponse(
+            success: true,
+            message: "Statistiques des carrés récupérées avec succès.",
+            data: $data
         );
     }
 }

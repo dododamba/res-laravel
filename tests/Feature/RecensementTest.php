@@ -50,6 +50,39 @@ class RecensementTest extends TestCase
             'slug' => 'carre-a1'
         ]);
 
+        $fonction = \App\Models\Parameters\Fonction::create([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'nom' => 'Enquêteur',
+            'code' => 'ENQ',
+            'slug' => 'enqueteur'
+        ]);
+
+        $personne = \App\Models\Personne::create([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'nom' => 'Zola',
+            'prenom' => 'Émile',
+            'email' => 'enqueteur@recensement.gov'
+        ]);
+
+        $agent = \App\Models\Agent::create([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'user_id' => $user->id,
+            'personne_id' => $personne->id,
+            'fonction_id' => $fonction->id,
+            'matricule' => 'AGT-REC-01',
+            'statut' => \App\Enums\AgentStatut::ACTIF,
+        ]);
+
+        \App\Models\Affectation::create([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'agent_id' => $agent->id,
+            'fonction_id' => $fonction->id,
+            'quartier_id' => $quartier->id,
+            'carre_id' => $carre->id,
+            'statut' => 'actif',
+            'date_debut' => now()->subDays(1),
+        ]);
+
         $besoin = \App\Models\Parameters\BesoinPrioritaire::create([
             'nom' => 'Accès Eau Potable',
             'code' => 'EAU',
