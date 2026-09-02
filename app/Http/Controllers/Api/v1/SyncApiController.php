@@ -176,16 +176,26 @@ class SyncApiController extends Controller
                         'nombre_hommes' => (int)($maisonData['nombre_hommes'] ?? $maisonData['nombreHommes'] ?? 0),
                         'nombre_femmes' => (int)($maisonData['nombre_femmes'] ?? $maisonData['nombreFemmes'] ?? 0),
                         'nombre_enfants' => (int)($maisonData['nombre_enfants'] ?? $maisonData['nombreEnfants'] ?? 0),
+                        'annee_construction' => isset($maisonData['anneeConstruction']) || isset($maisonData['annee_construction']) ? (int)($maisonData['anneeConstruction'] ?? $maisonData['annee_construction']) : null,
+                        'nombre_pieces' => isset($maisonData['nombrePieces']) || isset($maisonData['nombre_pieces']) ? (int)($maisonData['nombrePieces'] ?? $maisonData['nombre_pieces']) : null,
+                        'nombre_etages' => isset($maisonData['nombreEtages']) || isset($maisonData['nombre_etages']) ? (int)($maisonData['nombreEtages'] ?? $maisonData['nombre_etages']) : null,
+                        'occupation' => $maisonData['occupation'] ?? null,
+                        'materiau_murs' => $maisonData['materiauMurs'] ?? $maisonData['materiau_murs'] ?? null,
+                        'materiau_toiture' => $maisonData['materiauToiture'] ?? $maisonData['materiau_toiture'] ?? null,
+                        'materiau_sol' => $maisonData['materiauSol'] ?? $maisonData['materiau_sol'] ?? null,
+                        'etat_general' => $maisonData['etatGeneral'] ?? $maisonData['etat_general'] ?? null,
+                        'acces_voirie' => $maisonData['accesVoirie'] ?? $maisonData['acces_voirie'] ?? null,
+                        'acces_internet' => $maisonData['accesInternet'] ?? $maisonData['acces_internet'] ?? null,
                         'carre_id' => $maisonData['carre_id'] ?? $maisonData['carreId'] ?? null,
                         'recensement_id' => $maisonData['recensement_id'] ?? $maisonData['recensementId'] ?? null,
                         'reference_cadastrale' => $maisonData['reference_cadastrale'] ?? $maisonData['referenceCadastrale'] ?? null,
-                        'usage_principal_id' => $maisonData['usage_principal_id'] ?? $maisonData['usagePrincipalId'] ?? $maisonData['usage_principal'] ?? $maisonData['usage'] ?? null,
-                        'type_construction_id' => $maisonData['type_construction_id'] ?? $maisonData['typeConstructionId'] ?? $maisonData['type_construction'] ?? $maisonData['typeHabitation'] ?? null,
-                        'statut_foncier_id' => $maisonData['statut_foncier_id'] ?? $maisonData['statutFoncierId'] ?? $maisonData['statut_foncier'] ?? $maisonData['statutFoncier'] ?? null,
-                        'source_eau_id' => $maisonData['source_eau_id'] ?? $maisonData['sourceEauId'] ?? $maisonData['source_eau'] ?? $maisonData['accesEau'] ?? null,
-                        'source_energie_id' => $maisonData['source_energie_id'] ?? $maisonData['sourceEnergieId'] ?? $maisonData['source_energie'] ?? $maisonData['accesElectricite'] ?? null,
-                        'assainissement_id' => $maisonData['assainissement_id'] ?? $maisonData['assainissementId'] ?? $maisonData['assainissement'] ?? $maisonData['accesAssainissement'] ?? null,
-                        'gestion_dechet_id' => $maisonData['gestion_dechet_id'] ?? $maisonData['gestionDechetId'] ?? $maisonData['gestion_dechet'] ?? $maisonData['gestionDechets'] ?? null,
+                        'usage_principal_id' => $this->resolveParamId($maisonData['usage_principal_id'] ?? $maisonData['usagePrincipalId'] ?? $maisonData['usage_principal'] ?? $maisonData['usage'] ?? null, \App\Models\Parameters\CategorieActivite::class),
+                        'type_construction_id' => $this->resolveParamId($maisonData['type_construction_id'] ?? $maisonData['typeConstructionId'] ?? $maisonData['type_construction'] ?? $maisonData['typeHabitation'] ?? null, \App\Models\Parameters\TypeBatiment::class),
+                        'statut_foncier_id' => $this->resolveParamId($maisonData['statut_foncier_id'] ?? $maisonData['statutFoncierId'] ?? $maisonData['statut_foncier'] ?? $maisonData['statutFoncier'] ?? null, \App\Models\Parameters\TypePropriete::class),
+                        'source_eau_id' => $this->resolveParamId($maisonData['source_eau_id'] ?? $maisonData['sourceEauId'] ?? $maisonData['source_eau'] ?? $maisonData['accesEau'] ?? null, \App\Models\Parameters\SourceEau::class),
+                        'source_energie_id' => $this->resolveParamId($maisonData['source_energie_id'] ?? $maisonData['sourceEnergieId'] ?? $maisonData['source_energie'] ?? $maisonData['accesElectricite'] ?? null, \App\Models\Parameters\SourceEnergie::class),
+                        'assainissement_id' => $this->resolveParamId($maisonData['assainissement_id'] ?? $maisonData['assainissementId'] ?? $maisonData['assainissement'] ?? $maisonData['accesAssainissement'] ?? null, \App\Models\Parameters\Assainissement::class),
+                        'gestion_dechet_id' => $this->resolveParamId($maisonData['gestion_dechet_id'] ?? $maisonData['gestionDechetId'] ?? $maisonData['gestion_dechet'] ?? $maisonData['gestionDechets'] ?? null, \App\Models\Parameters\GestionDechet::class),
                         'gps_latitude' => $maisonData['gps_latitude'] ?? $maisonData['gpsLatitude'] ?? null,
                         'gps_longitude' => $maisonData['gps_longitude'] ?? $maisonData['gpsLongitude'] ?? null,
                         'gps_altitude' => $maisonData['gps_altitude'] ?? $maisonData['gpsAltitude'] ?? null,
@@ -218,6 +228,17 @@ class SyncApiController extends Controller
                     }
 
                     $maison->save();
+
+                    // Traitement des photos et documents Base64
+                    if (isset($maisonData['documents']) && is_array($maisonData['documents'])) {
+                        foreach ($maisonData['documents'] as $doc) {
+                            $base64 = $doc['base64'] ?? $doc['preview'] ?? null;
+                            if ($base64 && is_string($base64) && (str_starts_with($base64, 'data:') || strlen($base64) > 100)) {
+                                $this->attachBase64Media($maison, $base64, $doc['type'] ?? 'facade');
+                            }
+                        }
+                    }
+
                     $syncedIds['maisons'][] = $id;
 
                 } catch (Exception $e) {
@@ -411,5 +432,60 @@ class SyncApiController extends Controller
                 'server_timestamp' => now()->timestamp
             ]
         );
+    }
+
+    /**
+     * Tente de résoudre une valeur en UUID valide pour les clés étrangères paramétriques.
+     */
+    protected function resolveParamId(?string $value, string $modelClass): ?string
+    {
+        if (empty($value)) {
+            return null;
+        }
+
+        if (\Illuminate\Support\Str::isUuid($value)) {
+            return $value;
+        }
+
+        try {
+            $found = $modelClass::where('id', $value)
+                ->orWhere('nom', 'like', "%{$value}%")
+                ->orWhere('code', 'like', "%{$value}%")
+                ->first();
+
+            return $found ? (string) $found->id : null;
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Attache un média encodé en Base64 à la maison.
+     */
+    protected function attachBase64Media(Maison $maison, string $base64String, string $docType): void
+    {
+        try {
+            $ext = 'jpg';
+            $dataStr = $base64String;
+
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64String, $matches)) {
+                $ext = strtolower($matches[1]);
+                $dataStr = substr($base64String, strpos($base64String, ',') + 1);
+            } elseif (preg_match('/^data:application\/pdf;base64,/', $base64String)) {
+                $ext = 'pdf';
+                $dataStr = substr($base64String, strpos($base64String, ',') + 1);
+            }
+
+            $decoded = base64_decode($dataStr);
+            if ($decoded === false) return;
+
+            $tempPath = sys_get_temp_dir() . '/' . \Illuminate\Support\Str::uuid() . '.' . $ext;
+            file_put_contents($tempPath, $decoded);
+
+            $collection = ($docType === 'foncier' || $docType === 'cadastre') ? 'documents_cadastre' : 'photos_habitation';
+            $maison->addMedia($tempPath)->toMediaCollection($collection);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Erreur lors de l'attachement du média base64: " . $e->getMessage());
+        }
     }
 }

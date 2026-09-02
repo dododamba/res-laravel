@@ -278,4 +278,44 @@ class MobileTaxCollectionTest extends TestCase
         $this->taxeOp->refresh();
         $this->assertEquals(50000, $this->taxeOp->montant_paye);
     }
+
+    /** @test */
+    public function payment_without_preassigned_taxe_operateur_id_auto_assigns_tax_and_succeeds()
+    {
+        $newTaxe = Taxe::create([
+            'id' => (string) Str::uuid(),
+            'uuid' => (string) Str::uuid(),
+            'code' => 'ODP-TERR-TEST',
+            'nom' => 'Taxe Occupation Domaine Public',
+            'montant' => 15000.00,
+            'mode_calcul' => 'fixe',
+            'periodicite' => 'annuelle',
+            'actif' => true,
+        ]);
+
+        $payload = [
+            'uuid' => (string) Str::uuid(),
+            'taxe_operateur_id' => 0,
+            'operateur_id' => $this->operateur->id,
+            'taxe_code' => 'ODP-TERR-TEST',
+            'montant' => 15000,
+            'mode_paiement' => 'Espèces',
+            'date_paiement' => '2026-09-02',
+        ];
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/tax-payments', $payload);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('success', true);
+
+        // Vérifier que la taxe a été automatiquement attribuée à l'opérateur
+        $createdTaxeOp = TaxeOperateur::where('operateur_id', $this->operateur->id)
+            ->where('taxe_id', $newTaxe->id)
+            ->first();
+
+        $this->assertNotNull($createdTaxeOp);
+        $this->assertEquals(15000, $createdTaxeOp->montant_paye);
+        $this->assertEquals(TaxeStatut::SOLDE, $createdTaxeOp->statut);
+    }
 }

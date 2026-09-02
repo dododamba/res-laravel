@@ -4,7 +4,7 @@
 
 @section('content')
 <!--begin::Toolbar-->
-<div class="d-flex align-items-center justify-content-between mb-5">
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-5">
     <div>
         <h1 class="fw-bold text-gray-900 mb-1">Comptes Utilisateurs</h1>
         <span class="text-muted fs-7">Gestion des habilitations RBAC et des accès système</span>
@@ -18,13 +18,13 @@
     <div class="card-header align-items-center py-5 gap-2 gap-md-5">
         <div class="card-title">
             <!--begin::Search and Filters-->
-            <form method="GET" action="{{ route('user.index') }}" class="d-flex align-items-center gap-3">
+            <form method="GET" action="{{ route('user.index') }}" class="d-flex flex-wrap align-items-center gap-3">
                 <div class="position-relative my-1">
                     <i class="fas fa-search fs-4 position-absolute ms-4 text-gray-500" style="top: 50%; transform: translateY(-50%);"></i>
-                    <input type="text" name="q" value="{{ request('q') }}" class="form-control form-control-solid w-250px ps-12" placeholder="Rechercher par nom, e-mail..." />
+                    <input type="text" name="q" value="{{ request('q') }}" class="form-control form-control-solid w-250px w-sm-auto ps-12" placeholder="Rechercher par nom, e-mail..." />
                 </div>
                 
-                <select name="role" class="form-select form-select-solid w-200px" onchange="this.form.submit()">
+                <select name="role" class="form-select form-select-solid" onchange="this.form.submit()">
                     <option value="">Tous les rôles...</option>
                     @foreach($roles as $role)
                         <option value="{{ $role->slug }}" {{ request('role') == $role->slug ? 'selected' : '' }}>

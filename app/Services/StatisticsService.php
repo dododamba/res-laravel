@@ -157,8 +157,9 @@ class StatisticsService
             ->pluck('count', 'quartier_id');
 
         $habitatsPerQuartier = Maison::query()
-            ->join('carres', 'maisons.carre_id', '=', 'carres.id')
+            ->leftJoin('carres', 'maisons.carre_id', '=', 'carres.id')
             ->selectRaw('carres.quartier_id, COUNT(maisons.id) as count')
+            ->whereNotNull('carres.quartier_id')
             ->groupBy('carres.quartier_id')
             ->pluck('count', 'carres.quartier_id');
 

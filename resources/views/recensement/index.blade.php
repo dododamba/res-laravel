@@ -13,7 +13,7 @@
                 <span class="svg-icon svg-icon-1 position-absolute ms-4">
                     {!! $theme->getSvgIcon('duotune/general/gen021.svg', 'svg-icon-2') !!}
                 </span>
-                <input type="text" name="q" value="{{ request('q') }}" class="form-control form-control-solid w-250px ps-14" placeholder="Rechercher un chef..." />
+                <input type="text" name="q" value="{{ request('q') }}" class="form-control form-control-solid w-250px w-sm-auto ps-14" placeholder="Rechercher un chef..." />
                 @if(request('quartier_id'))
                     <input type="hidden" name="quartier_id" value="{{ request('quartier_id') }}" />
                 @endif
@@ -25,21 +25,21 @@
         <!--end::Card Title-->
 
         <!--begin::Card Toolbar (Filtres et Création)-->
-        <div class="card-toolbar d-flex flex-stack gap-3">
+        <div class="card-toolbar d-flex flex-wrap gap-2">
             <!--Filtres-->
-            <form method="GET" action="{{ route('recensement.index') }}" class="d-flex align-items-center gap-2">
+            <form method="GET" action="{{ route('recensement.index') }}" class="d-flex flex-wrap align-items-center gap-2">
                 @if(request('q'))
                     <input type="hidden" name="q" value="{{ request('q') }}" />
                 @endif
                 
-                <select name="quartier_id" class="form-select form-select-solid w-150px" onchange="this.form.submit()">
+                <select name="quartier_id" class="form-select form-select-solid" onchange="this.form.submit()">
                     <option value="">Tous les quartiers</option>
                     @foreach($quartiers as $q)
                         <option value="{{ $q->id }}" {{ request('quartier_id') == $q->id ? 'selected' : '' }}>{{ $q->nom }}</option>
                     @endforeach
                 </select>
 
-                <select name="statut" class="form-select form-select-solid w-150px" onchange="this.form.submit()">
+                <select name="statut" class="form-select form-select-solid" onchange="this.form.submit()">
                     <option value="">Tous les statuts</option>
                     @foreach(\App\Enums\RecensementStatut::cases() as $status)
                         <option value="{{ $status->value }}" {{ request('statut') == $status->value ? 'selected' : '' }}>{{ $status->label() }}</option>

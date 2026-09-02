@@ -16,9 +16,15 @@
         <link href="{{ asset($css) }}" rel="stylesheet" type="text/css" />
     @endforeach
 
+    <!-- CSS Responsive Personnalisé -->
+    <link href="{{ asset('css/backoffice-responsive.css') }}" rel="stylesheet" type="text/css" />
+
     @stack('styles')
 </head>
 <body id="kt_app_body" {!! $theme->printHtmlClasses('body') !!} {!! $theme->printHtmlAttributes('body') !!}>
+
+    <!-- Overlay Mobile Drawer Sidebar -->
+    <div id="kt_sidebar_overlay" class="drawer-overlay"></div>
 
     <!--begin::App-->
     <div class="d-flex flex-column flex-root app-root" id="kt_app_root">
@@ -104,5 +110,62 @@
     @endforeach
 
     @stack('scripts')
+
+    <!-- Script Drawer Sidebar Mobile -->
+    <script>
+    (function () {
+        var toggleBtn  = document.getElementById('kt_app_sidebar_mobile_toggle');
+        var sidebar    = document.getElementById('kt_app_sidebar');
+        var overlay    = document.getElementById('kt_sidebar_overlay');
+        var BREAKPOINT = 992; // lg
+
+        function isMobile() {
+            return window.innerWidth < BREAKPOINT;
+        }
+
+        function openDrawer() {
+            if (!sidebar || !overlay) return;
+            sidebar.classList.add('drawer-open');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDrawer() {
+            if (!sidebar || !overlay) return;
+            sidebar.classList.remove('drawer-open');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function toggleDrawer() {
+            if (!isMobile()) return;
+            sidebar.classList.contains('drawer-open') ? closeDrawer() : openDrawer();
+        }
+
+        // Fermer si on passe en desktop
+        window.addEventListener('resize', function () {
+            if (!isMobile()) {
+                closeDrawer();
+            }
+        });
+
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', toggleDrawer);
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', closeDrawer);
+        }
+
+        // Fermer le drawer en cliquant sur un lien du menu
+        if (sidebar) {
+            sidebar.querySelectorAll('.menu-link').forEach(function (link) {
+                link.addEventListener('click', function () {
+                    if (isMobile()) closeDrawer();
+                });
+            });
+        }
+    })();
+    </script>
 </body>
 </html>

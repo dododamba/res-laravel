@@ -54,8 +54,48 @@ class TaxPaymentService
                 }
             }
 
-            // ─── Chargement de la taxe assignée à l'opérateur avec verrou pessimiste (concurrence) ──
-            $taxeOp = TaxeOperateur::with(['operateur', 'taxe'])->lockForUpdate()->findOrFail($data['taxe_operateur_id']);
+            // ─── Chargement ou Résolution de la taxe assignée à l'opérateur ───
+            $taxeOp = null;
+            $taxeOpId = $data['taxe_operateur_id'] ?? null;
+            if ($taxeOpId && $taxeOpId !== '0' && $taxeOpId !== 0) {
+                $taxeOp = TaxeOperateur::with(['operateur', 'taxe'])->lockForUpdate()->find($taxeOpId);
+            }
+
+            if (!$taxeOp && !empty($data['operateur_id'])) {
+                $operateur = Operateur::where('id', $data['operateur_id'])
+                    ->orWhere('uuid', $data['operateur_id'])
+                    ->first();
+
+                if ($operateur) {
+                    $taxeSearch = $data['taxe_code'] ?? $data['selected_tax_type_id'] ?? $data['taxe_nom'] ?? null;
+                    $taxe = null;
+                    if ($taxeSearch) {
+                        $cleanSearch = str_replace('taxe_', '', strtolower($taxeSearch));
+                        $taxe = \App\Models\Taxe::where('id', $taxeSearch)
+                            ->orWhere('uuid', $taxeSearch)
+                            ->orWhere('code', $taxeSearch)
+                            ->orWhere('nom', 'like', "%{$taxeSearch}%")
+                            ->orWhere('nom', 'like', "%{$cleanSearch}%")
+                            ->first();
+                    }
+
+                    if (!$taxe) {
+                        $taxe = \App\Models\Taxe::actif()->first();
+                    }
+
+                    if ($taxe) {
+                        $anneeFiscale = (int) ($data['periode_fiscale'] ?? date('Y'));
+                        $assignedModel = $this->assignmentService->assignTaxToOperateur($operateur, $taxe, $anneeFiscale);
+                        $taxeOp = TaxeOperateur::with(['operateur', 'taxe'])->lockForUpdate()->find($assignedModel->id);
+                    }
+                }
+            }
+
+            if (!$taxeOp) {
+                throw ValidationException::withMessages([
+                    'taxe_operateur_id' => 'Taxe affectée introuvable. Veuillez vérifier l\'opérateur et le type de taxe sélectionné.',
+                ]);
+            }
 
             // Règle : une taxe déjà soldée ne peut être payée de nouveau
             if ($taxeOp->statut === TaxeStatut::SOLDE) {

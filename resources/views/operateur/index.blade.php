@@ -13,16 +13,16 @@
                 <span class="svg-icon svg-icon-1 position-absolute ms-4">
                     {!! $theme->getSvgIcon('duotune/general/gen021.svg', 'svg-icon-2') !!}
                 </span>
-                <input type="text" name="q" value="{{ request('q') }}" class="form-control form-control-solid w-250px ps-14" placeholder="Raison sociale..." />
+                <input type="text" name="q" value="{{ request('q') }}" class="form-control form-control-solid w-250px w-sm-auto ps-14" placeholder="Raison sociale..." />
             </form>
         </div>
         <!--end::Card Title-->
 
         <!--begin::Card Toolbar (Filtres et Création)-->
-        <div class="card-toolbar d-flex flex-stack gap-3">
+        <div class="card-toolbar d-flex flex-wrap gap-2">
             <!--Filtres-->
-            <form method="GET" action="{{ route('operateur.index') }}" class="d-flex align-items-center gap-2">
-                <select name="statut" class="form-select form-select-solid w-150px" onchange="this.form.submit()">
+            <form method="GET" action="{{ route('operateur.index') }}" class="d-flex flex-wrap align-items-center gap-2">
+                <select name="statut" class="form-select form-select-solid" onchange="this.form.submit()">
                     <option value="">Tous les statuts</option>
                     @foreach(\App\Enums\OperateurStatut::cases() as $status)
                         <option value="{{ $status->value }}" {{ request('statut') == $status->value ? 'selected' : '' }}>{{ $status->label() }}</option>

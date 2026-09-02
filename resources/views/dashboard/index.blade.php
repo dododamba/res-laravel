@@ -6,7 +6,7 @@
 <!--begin::Row - Chiffres Clés-->
 <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
     <!-- Total Population -->
-    <div class="col-md-3 col-xl-3">
+    <div class="col-6 col-md-3 col-xl-3">
         <div class="card card-flush h-md-100 bg-primary text-white">
             <div class="card-header pt-5">
                 <div class="card-title d-flex flex-column">
@@ -23,7 +23,7 @@
     </div>
 
     <!-- Total Ménages -->
-    <div class="col-md-3">
+    <div class="col-6 col-md-3">
         <div class="card bg-body border-0 shadow-sm h-md-100">
             <div class="card-body d-flex flex-column justify-content-between">
                 <div class="d-flex flex-stack justify-content-between mb-3">
@@ -43,7 +43,7 @@
     </div>
 
     <!-- Total Habitations -->
-    <div class="col-md-3">
+    <div class="col-6 col-md-3">
         <div class="card bg-body border-0 shadow-sm h-md-100">
             <div class="card-body d-flex flex-column justify-content-between">
                 <div class="d-flex flex-stack justify-content-between mb-3">
@@ -63,7 +63,7 @@
     </div>
 
     <!-- Total Opérateurs -->
-    <div class="col-md-3">
+    <div class="col-6 col-md-3">
         <div class="card bg-body border-0 shadow-sm h-md-100">
             <div class="card-body d-flex flex-column justify-content-between">
                 <div class="d-flex flex-stack justify-content-between mb-3">
@@ -101,25 +101,25 @@
             </div>
             <div class="card-body pt-2">
                 <div class="row g-5 align-items-center">
-                    <div class="col-md-3">
+                    <div class="col-6 col-md-3">
                         <div class="bg-white rounded p-4 shadow-xs">
                             <span class="fs-7 text-muted fw-bold d-block text-uppercase">Total Recettes Attendu</span>
                             <span class="fs-2hx fw-bolder text-gray-900">{{ number_format($fiscalStats['montant_attendu'] ?? 0) }} F</span>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-6 col-md-3">
                         <div class="bg-white rounded p-4 shadow-xs">
                             <span class="fs-7 text-muted fw-bold d-block text-uppercase">Recettes Encaissées</span>
                             <span class="fs-2hx fw-bolder text-success">{{ number_format($fiscalStats['montant_encaisse'] ?? 0) }} F</span>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-6 col-md-3">
                         <div class="bg-white rounded p-4 shadow-xs">
                             <span class="fs-7 text-muted fw-bold d-block text-uppercase">Reste à Payer</span>
                             <span class="fs-2hx fw-bolder text-danger">{{ number_format($fiscalStats['montant_restant'] ?? 0) }} F</span>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-6 col-md-3">
                         <div class="bg-white rounded p-4 shadow-xs">
                             <div class="d-flex flex-stack mb-2">
                                 <span class="fs-7 text-muted fw-bold text-uppercase">Taux Recouvrement</span>

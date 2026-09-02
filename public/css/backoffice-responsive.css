@@ -1,0 +1,299 @@
+/* =============================================================================
+   BACKOFFICE RESPONSIVE — Recensement Territorial
+   Complète le thème Metronic sur les breakpoints non couverts
+   ============================================================================= */
+
+/* ─── VARIABLES ──────────────────────────────────────────────────────────────── */
+:root {
+    --sidebar-width: 265px;
+}
+
+/* ─── SIDEBAR DRAWER MOBILE ──────────────────────────────────────────────────── */
+
+/* Overlay sombre quand le drawer est ouvert */
+.drawer-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 109;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    transition: opacity 0.3s ease;
+}
+
+.drawer-overlay.active {
+    display: block;
+    animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* ─── CARD HEADER / TOOLBAR RESPONSIVE ───────────────────────────────────────── */
+
+/* Sur mobile, le card-header doit passer en colonne */
+@media (max-width: 767.98px) {
+    .card-header.align-items-center {
+        flex-wrap: wrap !important;
+        row-gap: 0.75rem;
+    }
+
+    .card-header .card-title {
+        width: 100%;
+        flex: 0 0 100%;
+    }
+
+    .card-header .card-toolbar {
+        width: 100%;
+        flex: 0 0 100%;
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+        justify-content: flex-start !important;
+    }
+
+    .card-header .card-toolbar form {
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+        width: 100%;
+    }
+
+    /* Champs recherche pleine largeur sur mobile */
+    .card-header .card-title form,
+    .card-header .card-title .position-relative {
+        width: 100%;
+    }
+
+    .card-header input[type="text"].form-control,
+    .card-header .form-control-solid {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    /* Selects filtres pleine largeur */
+    .card-header select.form-select {
+        width: 100% !important;
+        min-width: 0 !important;
+        flex: 1 1 calc(50% - 0.25rem);
+    }
+
+    /* Bouton "Nouveau" pleine largeur */
+    .card-header .card-toolbar > a.btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ─── TOOLBAR DE PAGE (d-flex justify-content-between) ───────────────────────── */
+
+@media (max-width: 767.98px) {
+    .d-flex.align-items-center.justify-content-between.mb-5 {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    /* Form inline filtres dans user/index */
+    .card-title form.d-flex {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .card-title form.d-flex input[type="text"] {
+        width: 100% !important;
+    }
+
+    .card-title form.d-flex select.form-select {
+        flex: 1 1 calc(50% - 0.25rem);
+        min-width: 0;
+    }
+
+    .card-title form.d-flex a.btn {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+}
+
+/* ─── TABLES RESPONSIVE ─────────────────────────────────────────────────────── */
+
+/* Assure que toutes les tables ont un scroll horizontal */
+.table-responsive {
+    -webkit-overflow-scrolling: touch;
+    border-radius: 0.425rem;
+}
+
+@media (max-width: 575.98px) {
+    /* Réduire la taille des boutons d'action dans les tables */
+    .table .btn-icon.btn-sm {
+        width: 28px;
+        height: 28px;
+        min-height: 28px;
+    }
+
+    /* Réduire font-size des badges dans les tables */
+    .table .badge {
+        font-size: 0.7rem;
+    }
+
+    /* Compacter les cellules */
+    .table td,
+    .table th {
+        padding: 0.5rem 0.4rem;
+    }
+}
+
+/* ─── DASHBOARD — STATISTIQUES KPI ─────────────────────────────────────────── */
+
+@media (max-width: 767.98px) {
+    /* Section fiscalité : mini-cards en 2 colonnes */
+    .card-body .row.g-5.align-items-center > [class*="col-md-3"] {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+@media (max-width: 479.98px) {
+    /* Très petit écran : 1 colonne */
+    .card-body .row.g-5.align-items-center > [class*="col-md-3"] {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* ─── PAGINATION ─────────────────────────────────────────────────────────────── */
+
+@media (max-width: 575.98px) {
+    .d-flex.justify-content-end.mt-5 {
+        justify-content: center !important;
+    }
+
+    /* Pagination Bootstrap */
+    .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.25rem;
+    }
+
+    .page-item .page-link {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* ─── FOOTER RESPONSIVE ─────────────────────────────────────────────────────── */
+
+@media (max-width: 767.98px) {
+    #kt_app_footer .app-container {
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 0.5rem;
+        text-align: center;
+    }
+
+    #kt_app_footer .menu {
+        justify-content: center;
+    }
+}
+
+/* ─── HEADER RESPONSIVE ──────────────────────────────────────────────────────── */
+
+@media (max-width: 767.98px) {
+    #kt_app_header .app-container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    /* Titre de page — réduire taille */
+    #kt_app_header h1.fs-5 {
+        font-size: 0.9rem !important;
+    }
+
+    #kt_app_header .text-muted.fs-8 {
+        font-size: 0.7rem !important;
+    }
+}
+
+/* ─── CONTENT CONTAINER PADDING ────────────────────────────────────────────── */
+
+@media (max-width: 575.98px) {
+    #kt_app_content_container.container-fluid {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
+    /* Réduire le padding des cards sur très petit écran */
+    .card-body {
+        padding: 1rem;
+    }
+
+    .card-header {
+        padding: 1rem;
+    }
+}
+
+/* ─── ALERT RESPONSIVE ───────────────────────────────────────────────────────── */
+
+@media (max-width: 575.98px) {
+    .alert.d-flex {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .alert i.fs-2hx {
+        font-size: 1.5rem !important;
+    }
+}
+
+/* ─── APP-SIDEBAR MOBILE (DRAWER) ────────────────────────────────────────────── */
+
+@media (max-width: 991.98px) {
+    /* Par défaut : masqué hors écran à gauche */
+    #kt_app_sidebar {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: var(--sidebar-width) !important;
+        z-index: 110;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+        overflow-y: auto;
+    }
+
+    /* Ouvert via classe JS */
+    #kt_app_sidebar.drawer-open {
+        transform: translateX(0) !important;
+    }
+
+    /* Supprimer l'espace réservé au sidebar sur mobile */
+    #kt_app_wrapper {
+        flex-direction: column !important;
+    }
+
+    /* Le contenu principal prend toute la largeur */
+    #kt_app_main {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+}
+
+@media (min-width: 992px) {
+    /* Desktop : sidebar toujours visible, aucun tiroir */
+    #kt_app_sidebar {
+        transform: none !important;
+        position: relative !important;
+    }
+}
+
+/* ─── TOGGLE SIDEBAR BUTTON ──────────────────────────────────────────────────── */
+
+@media (min-width: 992px) {
+    /* Cacher le bouton hamburger sur desktop */
+    .d-lg-none[title="Afficher la barre latérale"] {
+        display: none !important;
+    }
+}

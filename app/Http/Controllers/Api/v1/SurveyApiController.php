@@ -119,6 +119,61 @@ class SurveyApiController extends Controller
     }
 
     /**
+     * Tente de résoudre une valeur en UUID valide pour les clés étrangères paramétriques.
+     */
+    protected function resolveParamId(?string $value, string $modelClass): ?string
+    {
+        if (empty($value)) {
+            return null;
+        }
+
+        if (Str::isUuid($value)) {
+            return $value;
+        }
+
+        try {
+            $found = $modelClass::where('id', $value)
+                ->orWhere('nom', 'like', "%{$value}%")
+                ->orWhere('code', 'like', "%{$value}%")
+                ->first();
+
+            return $found ? (string) $found->id : null;
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Attache un média encodé en Base64 à la maison.
+     */
+    protected function attachBase64Media(Maison $maison, string $base64String, string $docType): void
+    {
+        try {
+            $ext = 'jpg';
+            $dataStr = $base64String;
+
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64String, $matches)) {
+                $ext = strtolower($matches[1]);
+                $dataStr = substr($base64String, strpos($base64String, ',') + 1);
+            } elseif (preg_match('/^data:application\/pdf;base64,/', $base64String)) {
+                $ext = 'pdf';
+                $dataStr = substr($base64String, strpos($base64String, ',') + 1);
+            }
+
+            $decoded = base64_decode($dataStr);
+            if ($decoded === false) return;
+
+            $tempPath = sys_get_temp_dir() . '/' . Str::uuid() . '.' . $ext;
+            file_put_contents($tempPath, $decoded);
+
+            $collection = ($docType === 'foncier' || $docType === 'cadastre') ? 'documents_cadastre' : 'photos_habitation';
+            $maison->addMedia($tempPath)->toMediaCollection($collection);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Erreur lors de l'attachement du média base64: " . $e->getMessage());
+        }
+    }
+
+    /**
      * Endpoint API : Création d'une fiche d'habitation (Maison)
      */
     public function createMaison(Request $request): JsonResponse
@@ -130,29 +185,49 @@ class SurveyApiController extends Controller
 
         try {
             $maison = new Maison();
-            $maison->id = (string) Str::uuid();
+            $maison->id = $data['uuid'] ?? $data['id'] ?? (string) Str::uuid();
             $maison->numero_porte = $data['numeroPorte'] ?? $data['numero_porte'] ?? null;
             $maison->adresse = $data['adresse'] ?? '';
             $maison->nombre_hommes = (int)($data['nombreHommes'] ?? $data['nombre_hommes'] ?? 0);
             $maison->nombre_femmes = (int)($data['nombreFemmes'] ?? $data['nombre_femmes'] ?? 0);
             $maison->nombre_enfants = (int)($data['nombreEnfants'] ?? $data['nombre_enfants'] ?? 0);
-            $maison->gps_latitude = $data['gpsLatitude'] ?? null;
-            $maison->gps_longitude = $data['gpsLongitude'] ?? null;
+
+            // Caractéristiques étendues du bâtiment
+            $maison->annee_construction = isset($data['anneeConstruction']) || isset($data['annee_construction']) ? (int)($data['anneeConstruction'] ?? $data['annee_construction']) : null;
+            $maison->nombre_pieces = isset($data['nombrePieces']) || isset($data['nombre_pieces']) ? (int)($data['nombrePieces'] ?? $data['nombre_pieces']) : null;
+            $maison->nombre_etages = isset($data['nombreEtages']) || isset($data['nombre_etages']) ? (int)($data['nombreEtages'] ?? $data['nombre_etages']) : null;
+            $maison->occupation = $data['occupation'] ?? null;
+            $maison->materiau_murs = $data['materiauMurs'] ?? $data['materiau_murs'] ?? null;
+            $maison->materiau_toiture = $data['materiauToiture'] ?? $data['materiau_toiture'] ?? null;
+            $maison->materiau_sol = $data['materiauSol'] ?? $data['materiau_sol'] ?? null;
+            $maison->etat_general = $data['etatGeneral'] ?? $data['etat_general'] ?? null;
+            $maison->acces_voirie = $data['accesVoirie'] ?? $data['acces_voirie'] ?? null;
+            $maison->acces_internet = $data['accesInternet'] ?? $data['acces_internet'] ?? null;
+
+            // GPS & Métadonnées
+            $maison->gps_latitude = $data['gpsLatitude'] ?? $data['gps_latitude'] ?? null;
+            $maison->gps_longitude = $data['gpsLongitude'] ?? $data['gps_longitude'] ?? null;
+            $maison->gps_altitude = $data['gpsAltitude'] ?? $data['gps_altitude'] ?? null;
+            $maison->gps_precision = $data['gpsPrecision'] ?? $data['gps_precision'] ?? null;
+            $maison->gps_date_capture = $data['gpsDateCapture'] ?? $data['gps_date_capture'] ?? null;
+
             $maison->proprietaire_nom = $data['proprietaire_nom'] ?? $data['proprietaireNom'] ?? null;
             $maison->proprietaire_telephone = $data['proprietaire_telephone'] ?? $data['proprietaireTelephone'] ?? null;
             $maison->statut = MaisonStatut::SOUMIS;
 
             $maison->reference_cadastrale = $data['referenceCadastrale'] ?? $data['reference_cadastrale'] ?? null;
-            $maison->usage_principal_id = $data['usage_principal_id'] ?? $data['usagePrincipalId'] ?? $data['usage_principal'] ?? $data['usage'] ?? null;
-            $maison->type_construction_id = $data['type_construction_id'] ?? $data['typeConstructionId'] ?? $data['type_construction'] ?? $data['typeHabitation'] ?? null;
-            $maison->statut_foncier_id = $data['statut_foncier_id'] ?? $data['statutFoncierId'] ?? $data['statut_foncier'] ?? $data['statutFoncier'] ?? null;
-            $maison->source_eau_id = $data['source_eau_id'] ?? $data['sourceEauId'] ?? $data['source_eau'] ?? $data['accesEau'] ?? null;
-            $maison->source_energie_id = $data['source_energie_id'] ?? $data['sourceEnergieId'] ?? $data['source_energie'] ?? $data['accesElectricite'] ?? null;
-            $maison->assainissement_id = $data['assainissement_id'] ?? $data['assainissementId'] ?? $data['assainissement'] ?? $data['accesAssainissement'] ?? null;
-            $maison->gestion_dechet_id = $data['gestion_dechet_id'] ?? $data['gestionDechetId'] ?? $data['gestion_dechet'] ?? $data['gestionDechets'] ?? null;
 
-            if (isset($data['carre_id'])) {
-                $maison->carre_id = $data['carre_id'];
+            // Résolution des paramètres en UUIDs valides
+            $maison->usage_principal_id = $this->resolveParamId($data['usage_principal_id'] ?? $data['usagePrincipalId'] ?? $data['usage_principal'] ?? $data['usage'] ?? null, \App\Models\Parameters\CategorieActivite::class);
+            $maison->type_construction_id = $this->resolveParamId($data['type_construction_id'] ?? $data['typeConstructionId'] ?? $data['type_construction'] ?? $data['typeHabitation'] ?? null, \App\Models\Parameters\TypeBatiment::class);
+            $maison->statut_foncier_id = $this->resolveParamId($data['statut_foncier_id'] ?? $data['statutFoncierId'] ?? $data['statut_foncier'] ?? $data['statutFoncier'] ?? null, \App\Models\Parameters\TypePropriete::class);
+            $maison->source_eau_id = $this->resolveParamId($data['source_eau_id'] ?? $data['sourceEauId'] ?? $data['source_eau'] ?? $data['accesEau'] ?? null, \App\Models\Parameters\SourceEau::class);
+            $maison->source_energie_id = $this->resolveParamId($data['source_energie_id'] ?? $data['sourceEnergieId'] ?? $data['source_energie'] ?? $data['accesElectricite'] ?? null, \App\Models\Parameters\SourceEnergie::class);
+            $maison->assainissement_id = $this->resolveParamId($data['assainissement_id'] ?? $data['assainissementId'] ?? $data['assainissement'] ?? $data['accesAssainissement'] ?? null, \App\Models\Parameters\Assainissement::class);
+            $maison->gestion_dechet_id = $this->resolveParamId($data['gestion_dechet_id'] ?? $data['gestionDechetId'] ?? $data['gestion_dechet'] ?? $data['gestionDechets'] ?? null, \App\Models\Parameters\GestionDechet::class);
+
+            if (isset($data['carre_id']) || isset($data['carreId'])) {
+                $maison->carre_id = $data['carre_id'] ?? $data['carreId'];
             }
 
             if ($maison->carre_id && !$this->scopeService->canAccessCarre($maison->carre_id)) {
@@ -182,6 +257,16 @@ class SurveyApiController extends Controller
             }
 
             $maison->save();
+
+            // Attachement des photos et documents Base64
+            if (isset($data['documents']) && is_array($data['documents'])) {
+                foreach ($data['documents'] as $doc) {
+                    $base64 = $doc['base64'] ?? $doc['preview'] ?? null;
+                    if ($base64 && is_string($base64) && (str_starts_with($base64, 'data:') || strlen($base64) > 100)) {
+                        $this->attachBase64Media($maison, $base64, $doc['type'] ?? 'facade');
+                    }
+                }
+            }
 
             return $this->buildResponse(
                 success: true,
