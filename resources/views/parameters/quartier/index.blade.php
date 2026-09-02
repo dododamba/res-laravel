@@ -1,21 +1,16 @@
 @extends('layouts.app')
 
 @section('title', 'Gestion des Quartiers')
+@section('page_title', 'Gestion des Quartiers')
+@section('page_subtitle', 'Zonage et administration territoriale (Nomenclatures)')
+
+@section('actions')
+    <a href="{{ route('quartier.create') }}" class="btn btn-sm btn-primary d-flex align-items-center">
+        <i class="fas fa-plus me-2"></i>Nouveau Quartier
+    </a>
+@endsection
 
 @section('content')
-<!--begin::Header Layout-->
-<div class="d-flex align-items-center justify-content-between mb-5">
-    <div>
-        <h1 class="fw-bold text-gray-900 mb-1">Gestion des Quartiers</h1>
-        <span class="text-muted fs-7">Zonage et administration territoriale (Nomenclatures)</span>
-    </div>
-    <div>
-        <a href="{{ route('quartier.create') }}" class="btn btn-primary d-flex align-items-center">
-            <i class="fas fa-plus me-2"></i>Nouveau Quartier
-        </a>
-    </div>
-</div>
-<!--end::Header Layout-->
 
 <!--begin::Statistiques Widgets-->
 <div class="row g-5 mb-6">

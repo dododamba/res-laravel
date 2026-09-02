@@ -1,21 +1,16 @@
 @extends('layouts.app')
 
 @section('title', 'Mon Profil Agent')
+@section('page_title', 'Mon Profil Agent')
+@section('page_subtitle', 'Vos informations personnelles et historique de vos affectations de terrain')
+
+@section('actions')
+    <a href="{{ route('profile.edit') }}" class="btn btn-sm btn-primary">
+        <i class="fas fa-user-cog me-1"></i>Paramètres du compte
+    </a>
+@endsection
 
 @section('content')
-<!--begin::Toolbar-->
-<div class="d-flex align-items-center justify-content-between mb-5">
-    <div>
-        <h1 class="fw-bold text-gray-900 mb-1">Mon Profil Agent</h1>
-        <span class="text-muted fs-7">Vos informations personnelles et historique de vos affectations de terrain</span>
-    </div>
-    <div>
-        <a href="{{ route('profile.edit') }}" class="btn btn-sm btn-primary">
-            <i class="fas fa-user-cog me-1"></i>Paramètres du compte
-        </a>
-    </div>
-</div>
-<!--end::Toolbar-->
 
 <div class="row g-6">
     <!-- Colonne Gauche: Résumé Profil -->

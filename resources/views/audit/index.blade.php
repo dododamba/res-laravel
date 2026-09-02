@@ -1,16 +1,10 @@
 @extends('layouts.app')
 
 @section('title', "Journaux d'Audit Sécurité")
+@section('page_title', "Journaux d'Audit & Sécurité")
+@section('page_subtitle', 'Traçabilité complète des transactions, connexions et modifications (Journal d\'activités)')
 
 @section('content')
-<!--begin::Toolbar-->
-<div class="d-flex align-items-center justify-content-between mb-5">
-    <div>
-        <h1 class="fw-bold text-gray-900 mb-1">Journaux d'Audit & Sécurité</h1>
-        <span class="text-muted fs-7">Traçabilité complète des transactions, connexions et modifications (Journal d'activités)</span>
-    </div>
-</div>
-<!--end::Toolbar-->
 
 <!--begin::Card-->
 <div class="card card-flush shadow-sm">

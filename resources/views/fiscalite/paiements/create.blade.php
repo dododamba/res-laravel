@@ -1,14 +1,19 @@
 @extends('layouts.app')
 
 @section('title', 'Saisie d\'un Encaissement Taxe')
+@section('page_title', 'Encaissement de Taxe Municipale')
+@section('page_subtitle', 'Saisie de règlement, délivrance de quittance et mise à jour des soldes')
+
+@section('actions')
+    <a href="{{ route('paiements.index') }}" class="btn btn-sm btn-light">
+        <i class="fas fa-arrow-left me-1"></i>Retour au journal des paiements
+    </a>
+@endsection
 
 @section('content')
 <div class="row g-5 g-xl-10">
     <div class="col-xl-8">
         <div class="card card-flush shadow-sm mb-5 mb-xl-10">
-            <div class="card-header">
-                <h3 class="card-title fw-bold text-gray-900">Écran d'Encaissement de Taxe Municipale</h3>
-            </div>
 
             <form method="POST" action="{{ route('paiements.store') }}" enctype="multipart/form-data" class="form">
                 @csrf

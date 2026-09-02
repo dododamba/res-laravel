@@ -1,27 +1,22 @@
 @extends('layouts.app')
 
 @section('title', 'Détails du Carré : ' . $entity->nom)
+@section('page_title', 'Carré : ' . $entity->nom)
+@section('page_subtitle', 'Sous-division et secteur géographique de contrôle')
+
+@section('actions')
+    <a href="{{ route('carre.index') }}" class="btn btn-light btn-sm me-2">
+        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+    </a>
+    <a href="{{ route('carre.show', $entity) }}/edit" class="btn btn-primary btn-sm me-2">
+        <i class="fas fa-pencil-alt me-1"></i>Modifier
+    </a>
+    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
+        <i class="fas fa-trash me-1"></i>Archiver
+    </button>
+@endsection
 
 @section('content')
-<!--begin::Header Layout-->
-<div class="d-flex align-items-center justify-content-between mb-5">
-    <div>
-        <h1 class="fw-bold text-gray-900 mb-1">Carré : {{ $entity->nom }}</h1>
-        <span class="text-muted fs-7">Sous-division et secteur géographique de contrôle</span>
-    </div>
-    <div class="d-flex gap-3">
-        <a href="{{ route('carre.index') }}" class="btn btn-light btn-sm">
-            <i class="fas fa-arrow-left me-1"></i>Retour à la liste
-        </a>
-        <a href="{{ route('carre.index') }}/{{ $entity->id }}/edit" class="btn btn-primary btn-sm">
-            <i class="fas fa-pencil-alt me-1"></i>Modifier
-        </a>
-        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
-            <i class="fas fa-trash me-1"></i>Archiver
-        </button>
-    </div>
-</div>
-<!--end::Header Layout-->
 
 <!--begin::Delete Confirmation Modal-->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">

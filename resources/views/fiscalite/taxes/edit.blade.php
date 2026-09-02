@@ -1,12 +1,17 @@
 @extends('layouts.app')
 
 @section('title', 'Modifier une Taxe Municipale')
+@section('page_title', 'Édition de la taxe : ' . $taxe->nom)
+@section('page_subtitle', 'Code : ' . $taxe->code . ' | Catégorie : ' . $taxe->categorie)
+
+@section('actions')
+    <a href="{{ route('taxes.index') }}" class="btn btn-sm btn-light">
+        <i class="fas fa-arrow-left me-1"></i>Retour à la nomenclature
+    </a>
+@endsection
 
 @section('content')
 <div class="card card-flush shadow-sm">
-    <div class="card-header">
-        <h3 class="card-title fw-bold text-gray-900">Édition de la taxe : {{ $taxe->nom }}</h3>
-    </div>
     <form method="POST" action="{{ route('taxes.update', $taxe) }}" class="form">
         @csrf
         @method('PUT')

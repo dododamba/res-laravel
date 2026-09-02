@@ -1,20 +1,17 @@
 @extends('layouts.app')
 
 @section('title', "Modifier l'Agent : " . $agent->personne->prenom)
+@section('page_title', 'Modifier l\'Agent : ' . $agent->personne->prenom . ' ' . $agent->personne->nom)
+@section('page_subtitle', 'Modification de la fiche d\'identité et des paramètres techniques')
+
+@section('actions')
+    <a href="{{ route('agent.show', $agent) }}" class="btn btn-sm btn-light">
+        <i class="fas fa-arrow-left me-1"></i>Retour aux détails
+    </a>
+@endsection
 
 @section('content')
 <div class="card card-flush shadow-sm">
-    <div class="card-header py-5">
-        <div class="card-title d-flex flex-column">
-            <h3 class="fw-bold text-gray-900 mb-1">Modifier l'Agent : {{ $agent->personne->prenom }} {{ $agent->personne->nom }}</h3>
-            <span class="text-muted fs-7">Modification de la fiche d'identité et des paramètres techniques</span>
-        </div>
-        <div class="card-toolbar">
-            <a href="{{ route('agent.show', $agent) }}" class="btn btn-sm btn-light">
-                <i class="fas fa-arrow-left me-1"></i>Retour aux détails
-            </a>
-        </div>
-    </div>
 
     <div class="card-body">
         <form method="POST" action="{{ route('agent.update', $agent) }}" class="form">

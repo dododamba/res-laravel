@@ -1,22 +1,17 @@
 @extends('layouts.app')
 
 @section('title', 'Journal des Paiements & Encaissements')
+@section('page_title', 'Journal des Paiements & Encaissements')
+@section('page_subtitle', 'Historique certifié des quittances, reçus d\'encaissement et règlements fiscaux')
+
+@section('actions')
+    <a href="{{ route('paiements.create') }}" class="btn btn-sm btn-primary d-flex align-items-center">
+        {!! $theme->getSvgIcon('duotune/arrows/arr075.svg', 'svg-icon-2 text-white me-2') !!}
+        Nouvel Encaissement
+    </a>
+@endsection
 
 @section('content')
-<!--begin::Header Layout-->
-<div class="d-flex align-items-center justify-content-between mb-5">
-    <div>
-        <h1 class="fw-bold text-gray-900 mb-1">Journal des Paiements & Encaissements</h1>
-        <span class="text-muted fs-7">Historique certifié des quittances, reçus d'encaissement et règlements fiscaux</span>
-    </div>
-    <div>
-        <a href="{{ route('paiements.create') }}" class="btn btn-primary d-flex align-items-center">
-            {!! $theme->getSvgIcon('duotune/arrows/arr075.svg', 'svg-icon-2 text-white me-2') !!}
-            Nouvel Encaissement
-        </a>
-    </div>
-</div>
-<!--end::Header Layout-->
 
 <!--begin::Card-->
 <div class="card card-flush shadow-sm">

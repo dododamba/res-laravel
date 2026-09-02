@@ -1,24 +1,19 @@
 @extends('layouts.app')
 
 @section('title', 'Opérateurs Économiques')
+@section('page_title', 'Opérateurs Économiques & Entreprises')
+@section('page_subtitle', 'Registre des commerces, établissements artisanaux et contribuables municipaux')
+
+@can('can', 'OPERATEUR_CREATE')
+    @section('actions')
+        <a href="{{ route('operateur.create') }}" class="btn btn-sm btn-primary d-flex align-items-center">
+            {!! $theme->getSvgIcon('duotune/arrows/arr075.svg', 'svg-icon-2 text-white me-2') !!}
+            Saisir un opérateur
+        </a>
+    @endsection
+@endcan
 
 @section('content')
-<!--begin::Header Layout-->
-<div class="d-flex align-items-center justify-content-between mb-5">
-    <div>
-        <h1 class="fw-bold text-gray-900 mb-1">Opérateurs Économiques & Entreprises</h1>
-        <span class="text-muted fs-7">Registre des commerces, établissements artisanaux et contribuables municipaux</span>
-    </div>
-    <div>
-        @can('can', 'OPERATEUR_CREATE')
-            <a href="{{ route('operateur.create') }}" class="btn btn-primary d-flex align-items-center">
-                {!! $theme->getSvgIcon('duotune/arrows/arr075.svg', 'svg-icon-2 text-white me-2') !!}
-                Saisir un opérateur
-            </a>
-        @endcan
-    </div>
-</div>
-<!--end::Header Layout-->
 
 <!--begin::Card-->
 <div class="card card-flush shadow-sm">

@@ -11,17 +11,14 @@
         </div>
         <!--end::Sidebar toggle-->
 
-        <!--begin::Breadcrumbs / Titre de page-->
+        <!--begin::Application Title / Brand-->
         <div class="d-flex align-items-center flex-row-fluid" id="kt_app_header_wrapper">
-            <div class="app-header-menu app-header-mobile-drawer align-items-stretch">
-                <!-- Titre dynamique -->
-                <h1 class="text-gray-900 fw-bold d-flex flex-column justify-content-center my-0 fs-5">
-                    @yield('title', 'Administration')
-                    <span class="text-muted fs-8 fw-semibold mt-1">Recensement Territorial Communal</span>
-                </h1>
+            <div class="d-flex align-items-center">
+                <span class="text-gray-900 fw-bolder fs-4 me-2">Recensement Territorial</span>
+                <span class="badge badge-light-primary fw-bold fs-8 d-none d-sm-inline-block">Système Municipal</span>
             </div>
         </div>
-        <!--end::Breadcrumbs-->
+        <!--end::Application Title / Brand-->
 
         <!--begin::Navbar - Barre d'outils utilisateur-->
         <div class="app-navbar flex-shrink-0">

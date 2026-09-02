@@ -1,22 +1,19 @@
 @extends('layouts.app')
 
 @section('title', 'Détails du Paiement N° ' . $paiement->numero_recu)
+@section('page_title', 'Quittance de Paiement N° ' . $paiement->numero_recu)
+@section('page_subtitle', 'Certificat d\'encaissement et situation fiscale de l\'opérateur')
+
+@section('actions')
+    <a href="{{ route('paiements.recu', $paiement) }}" target="_blank" class="btn btn-sm btn-primary d-flex align-items-center me-2">
+        {!! $theme->getSvgIcon('duotune/general/gen005.svg', 'svg-icon-2 text-white me-2') !!}
+        Imprimer le Reçu Officiel
+    </a>
+    <a href="{{ route('paiements.index') }}" class="btn btn-sm btn-light">Retour à la liste</a>
+@endsection
 
 @section('content')
 <div class="card card-flush shadow-sm">
-    <div class="card-header align-items-center">
-        <div class="card-title">
-            <h3 class="fw-bolder text-gray-900 fs-2 me-3">Quittance de Paiement N° {{ $paiement->numero_recu }}</h3>
-            <span class="badge badge-light-success fs-7 fw-bold">Paiement Validé</span>
-        </div>
-        <div class="card-toolbar gap-3">
-            <a href="{{ route('paiements.recu', $paiement) }}" target="_blank" class="btn btn-primary d-flex align-items-center">
-                {!! $theme->getSvgIcon('duotune/general/gen005.svg', 'svg-icon-2 text-white me-2') !!}
-                Imprimer le Reçu Officiel
-            </a>
-            <a href="{{ route('paiements.index') }}" class="btn btn-light">Retour à la liste</a>
-        </div>
-    </div>
 
     <div class="card-body pt-5">
         <div class="row g-5 mb-8">

@@ -1,39 +1,23 @@
 @extends('layouts.app')
 
 @section('title', isset($isSelfEdit) && $isSelfEdit ? 'Paramètres de mon Compte' : "Modifier l'Utilisateur : " . $user->firstname)
+@section('page_title', isset($isSelfEdit) && $isSelfEdit ? 'Paramètres de mon Compte' : "Modifier l'Habilitation : " . $user->firstname . ' ' . $user->lastname)
+@section('page_subtitle', isset($isSelfEdit) && $isSelfEdit ? 'Mise à jour de vos identifiants, contact et photo de profil' : 'Modification du compte système, mot de passe et rôles RBAC')
+
+@section('actions')
+    @if(isset($isSelfEdit) && $isSelfEdit)
+        <a href="{{ route('profile.show') }}" class="btn btn-sm btn-light">
+            <i class="fas fa-arrow-left me-1"></i>Retour au profil
+        </a>
+    @else
+        <a href="{{ route('user.show', $user) }}" class="btn btn-sm btn-light">
+            <i class="fas fa-arrow-left me-1"></i>Retour aux détails
+        </a>
+    @endif
+@endsection
 
 @section('content')
-<!--begin::Toolbar-->
-<div class="d-flex align-items-center justify-content-between mb-5">
-    <div>
-        <h1 class="fw-bold text-gray-900 mb-1">
-            {{ isset($isSelfEdit) && $isSelfEdit ? 'Paramètres de mon Compte' : "Modifier l'Habilitation : " . $user->firstname . ' ' . $user->lastname }}
-        </h1>
-        <span class="text-muted fs-7">
-            {{ isset($isSelfEdit) && $isSelfEdit ? 'Mise à jour de vos identifiants, contact et photo de profil' : 'Modification du compte système, mot de passe et rôles RBAC' }}
-        </span>
-    </div>
-    <div>
-        @if(isset($isSelfEdit) && $isSelfEdit)
-            <a href="{{ route('profile.show') }}" class="btn btn-sm btn-light">
-                <i class="fas fa-arrow-left me-1"></i>Retour au profil
-            </a>
-        @else
-            <a href="{{ route('user.show', $user) }}" class="btn btn-sm btn-light">
-                <i class="fas fa-arrow-left me-1"></i>Retour aux détails
-            </a>
-        @endif
-    </div>
-</div>
-<!--end::Toolbar-->
-
 <div class="card card-flush shadow-sm">
-    <div class="card-header py-5">
-        <h3 class="card-title fw-bold text-gray-900">
-            {{ isset($isSelfEdit) && $isSelfEdit ? 'Modifier mes Paramètres' : 'Détails et rôles de l\'utilisateur' }}
-        </h3>
-    </div>
-    
     <div class="card-body">
         <form method="POST" action="{{ isset($isSelfEdit) && $isSelfEdit ? route('profile.update') : route('user.update', $user) }}" enctype="multipart/form-data" class="form">
             @csrf

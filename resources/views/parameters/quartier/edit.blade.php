@@ -1,20 +1,17 @@
 @extends('layouts.app')
 
 @section('title', 'Modifier le Quartier : ' . $entity->nom)
+@section('page_title', 'Modifier le Quartier : ' . $entity->nom)
+@section('page_subtitle', 'Édition de l\'aire administrative et de sa supervision')
+
+@section('actions')
+    <a href="{{ route('quartier.show', $entity) }}" class="btn btn-sm btn-light">
+        <i class="fas fa-arrow-left me-2"></i>Retour aux détails
+    </a>
+@endsection
 
 @section('content')
 <div class="card card-flush shadow-sm">
-    <div class="card-header py-5">
-        <div class="card-title d-flex flex-column">
-            <h3 class="fw-bold text-gray-900 mb-1">Modifier le Quartier : {{ $entity->nom }}</h3>
-            <span class="text-muted fs-7">Édition de l'aire administrative et de sa supervision</span>
-        </div>
-        <div class="card-toolbar">
-            <a href="{{ route('quartier.index') }}/{{ $entity->id }}" class="btn btn-sm btn-light">
-                <i class="fas fa-arrow-left me-2"></i>Retour aux détails
-            </a>
-        </div>
-    </div>
 
     <div class="card-body">
         <form method="POST" action="{{ route('quartier.index') }}/{{ $entity->id }}" class="form">

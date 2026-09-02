@@ -1,6 +1,19 @@
 @extends('layouts.app')
 
 @section('title', 'Fiche Opérateur : ' . ($operateur->nom_entreprise ?? $operateur->nom_commercial))
+@section('page_title', 'Fiche Opérateur Économique')
+@section('page_subtitle', $operateur->nom_entreprise ?? $operateur->nom_commercial)
+
+@section('actions')
+    <a href="{{ route('operateur.index') }}" class="btn btn-sm btn-light">
+        <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+    </a>
+    @can('can', 'OPERATEUR_EDIT')
+        <a href="{{ route('operateur.edit', $operateur) }}" class="btn btn-sm btn-primary">
+            <i class="fas fa-edit me-2"></i>Modifier
+        </a>
+    @endcan
+@endsection
 
 @section('content')
 <div class="d-flex flex-column flex-xl-row gap-7 gap-lg-10">

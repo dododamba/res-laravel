@@ -1,21 +1,16 @@
 @extends('layouts.app')
 
 @section('title', 'Gestion des Carrés (Blocs)')
+@section('page_title', 'Gestion des Carrés (Subdivisions)')
+@section('page_subtitle', 'Zonage urbain par blocs et îlots administratifs (Nomenclatures)')
+
+@section('actions')
+    <a href="{{ route('carre.create') }}" class="btn btn-sm btn-primary d-flex align-items-center">
+        <i class="fas fa-plus me-2"></i>Nouveau Carré
+    </a>
+@endsection
 
 @section('content')
-<!--begin::Header Layout-->
-<div class="d-flex align-items-center justify-content-between mb-5">
-    <div>
-        <h1 class="fw-bold text-gray-900 mb-1">Gestion des Carrés (Subdivisions)</h1>
-        <span class="text-muted fs-7">Zonage urbain par blocs et îlots administratifs (Nomenclatures)</span>
-    </div>
-    <div>
-        <a href="{{ route('carre.create') }}" class="btn btn-primary d-flex align-items-center">
-            <i class="fas fa-plus me-2"></i>Nouveau Carré
-        </a>
-    </div>
-</div>
-<!--end::Header Layout-->
 
 <!--begin::Main Card-->
 <div class="card card-flush shadow-sm">

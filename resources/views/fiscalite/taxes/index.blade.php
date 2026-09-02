@@ -1,22 +1,17 @@
 @extends('layouts.app')
 
 @section('title', 'Taxes Municipales')
+@section('page_title', 'Nomenclature des Taxes Municipales')
+@section('page_subtitle', 'Barème officiel, modes de calcul et arrêtés tarifaires communaux')
+
+@section('actions')
+    <a href="{{ route('taxes.create') }}" class="btn btn-sm btn-primary d-flex align-items-center">
+        {!! $theme->getSvgIcon('duotune/arrows/arr075.svg', 'svg-icon-2 text-white me-2') !!}
+        Nouvelle Taxe Municipale
+    </a>
+@endsection
 
 @section('content')
-<!--begin::Header Layout-->
-<div class="d-flex align-items-center justify-content-between mb-5">
-    <div>
-        <h1 class="fw-bold text-gray-900 mb-1">Nomenclature des Taxes Municipales</h1>
-        <span class="text-muted fs-7">Barème officiel, modes de calcul et arrêtés tarifaires communaux</span>
-    </div>
-    <div>
-        <a href="{{ route('taxes.create') }}" class="btn btn-primary d-flex align-items-center">
-            {!! $theme->getSvgIcon('duotune/arrows/arr075.svg', 'svg-icon-2 text-white me-2') !!}
-            Nouvelle Taxe Municipale
-        </a>
-    </div>
-</div>
-<!--end::Header Layout-->
 
 <!--begin::Card-->
 <div class="card card-flush shadow-sm">

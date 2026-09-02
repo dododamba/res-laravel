@@ -1,20 +1,17 @@
 @extends('layouts.app')
 
 @section('title', 'Modifier : ' . ($entity->nom ?? 'Paramètre'))
+@section('page_title', 'Modifier : ' . ($entity->nom ?? 'Paramètre'))
+@section('page_subtitle', 'Mise à jour de l\'enregistrement de référence')
+
+@section('actions')
+    <a href="{{ route($routePrefix . '.index') }}" class="btn btn-sm btn-light">
+        <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+    </a>
+@endsection
 
 @section('content')
 <div class="card card-flush shadow-sm">
-    <div class="card-header py-5">
-        <div class="card-title d-flex flex-column">
-            <h3 class="fw-bold text-gray-900 mb-1">Modifier : {{ $entity->nom }}</h3>
-            <span class="text-muted fs-7">Mise à jour de l'enregistrement de référence</span>
-        </div>
-        <div class="card-toolbar">
-            <a href="{{ route($routePrefix . '.index') }}" class="btn btn-sm btn-light">
-                <i class="fas fa-arrow-left me-2"></i>Retour à la liste
-            </a>
-        </div>
-    </div>
 
     <div class="card-body">
         <form method="POST" action="{{ route($routePrefix . '.update', $entity->id) }}" class="form">

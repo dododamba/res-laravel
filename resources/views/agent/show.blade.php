@@ -1,24 +1,19 @@
 @extends('layouts.app')
 
 @section('title', "Profil Agent : " . $agent->personne->prenom . " " . $agent->personne->nom)
+@section('page_title', 'Détails de l\'Agent Territorial')
+@section('page_subtitle', 'Fiche de ressources humaines et suivi d\'affectations terrain')
+
+@section('actions')
+    <a href="{{ route('agent.index') }}" class="btn btn-sm btn-light">
+        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+    </a>
+    <a href="{{ route('agent.edit', $agent) }}" class="btn btn-sm btn-primary">
+        <i class="fas fa-pencil-alt me-1"></i>Modifier la fiche
+    </a>
+@endsection
 
 @section('content')
-<!--begin::Toolbar-->
-<div class="d-flex align-items-center justify-content-between mb-5">
-    <div>
-        <h1 class="fw-bold text-gray-900 mb-1">Détails de l'Agent Territorial</h1>
-        <span class="text-muted fs-7">Fiche de ressources humaines et suivi d'affectations terrain</span>
-    </div>
-    <div class="d-flex gap-3">
-        <a href="{{ route('agent.index') }}" class="btn btn-sm btn-light">
-            <i class="fas fa-arrow-left me-1"></i>Retour à la liste
-        </a>
-        <a href="{{ route('agent.edit', $agent) }}" class="btn btn-sm btn-primary">
-            <i class="fas fa-pencil-alt me-1"></i>Modifier la fiche
-        </a>
-    </div>
-</div>
-<!--end::Toolbar-->
 
 <div class="row g-6">
     <!-- Colonne Gauche: Résumé Identité Agent -->

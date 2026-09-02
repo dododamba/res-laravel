@@ -1,23 +1,18 @@
 @extends('layouts.app')
 
 @section('title', 'Recenser une Nouvelle Habitation')
+@section('page_title', 'Saisie d\'une fiche d\'habitation')
+@section('page_subtitle', 'Collecte des informations d\'habitat et d\'urbanisme (Fiche n°2)')
+
+@section('actions')
+    <a href="{{ route('maison.index') }}" class="btn btn-sm btn-light">
+        <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+    </a>
+@endsection
 
 @section('content')
 <!--begin::Main form container-->
 <div class="card card-flush shadow-sm">
-    <!--begin::Card Header-->
-    <div class="card-header py-5">
-        <div class="card-title d-flex flex-column">
-            <h3 class="fw-bold text-gray-900 mb-1">Saisie d'une fiche d'habitation</h3>
-            <span class="text-muted fs-7">Collecte des informations d'habitat et d'urbanisme (Fiche n°2)</span>
-        </div>
-        <div class="card-toolbar">
-            <a href="{{ route('maison.index') }}" class="btn btn-sm btn-light">
-                <i class="fas fa-arrow-left me-2"></i>Retour à la liste
-            </a>
-        </div>
-    </div>
-    <!--end::Card Header-->
 
     <!--begin::Card Body-->
     <div class="card-body">

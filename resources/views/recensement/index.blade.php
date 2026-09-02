@@ -1,24 +1,19 @@
 @extends('layouts.app')
 
 @section('title', 'Recensement des Ménages')
+@section('page_title', 'Recensement des Ménages & Familles')
+@section('page_subtitle', 'Registre de la population municipale, fiches ménages et statistiques socio-démographiques')
+
+@can('can', 'RECENSEMENT_CREATE')
+    @section('actions')
+        <a href="{{ route('recensement.create') }}" class="btn btn-sm btn-primary d-flex align-items-center">
+            {!! $theme->getSvgIcon('duotune/arrows/arr075.svg', 'svg-icon-2 text-white me-2') !!}
+            Nouveau ménage
+        </a>
+    @endsection
+@endcan
 
 @section('content')
-<!--begin::Header Layout-->
-<div class="d-flex align-items-center justify-content-between mb-5">
-    <div>
-        <h1 class="fw-bold text-gray-900 mb-1">Recensement des Ménages & Familles</h1>
-        <span class="text-muted fs-7">Registre de la population municipale, fiches ménages et statistiques socio-démographiques</span>
-    </div>
-    <div>
-        @can('can', 'RECENSEMENT_CREATE')
-            <a href="{{ route('recensement.create') }}" class="btn btn-primary d-flex align-items-center">
-                {!! $theme->getSvgIcon('duotune/arrows/arr075.svg', 'svg-icon-2 text-white me-2') !!}
-                Nouveau ménage
-            </a>
-        @endcan
-    </div>
-</div>
-<!--end::Header Layout-->
 
 <!--begin::Card-->
 <div class="card card-flush shadow-sm">

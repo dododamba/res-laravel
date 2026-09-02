@@ -1,19 +1,20 @@
 @extends('layouts.app')
 
 @section('title', 'Tableau de Bord Décisionnel Fiscal')
+@section('page_title', 'Tableau de Bord Décisionnel - Fiscalité Municipale ' . $annee)
+@section('page_subtitle', 'Indicateurs de recouvrement, potentiel fiscal et répartition par catégorie')
 
-@section('content')
-<!-- Filter Year Header -->
-<div class="d-flex flex-stack mb-5">
-    <h1 class="fs-2x fw-bolder text-gray-900">Tableau de Bord Décisionnel - Fiscalité Municipale {{ $annee }}</h1>
+@section('actions')
     <form method="GET" action="{{ route('fiscalite.dashboard') }}" class="d-flex align-items-center gap-2">
-        <select name="annee" class="form-select form-select-solid w-150px" onchange="this.form.submit()">
+        <select name="annee" class="form-select form-select-solid form-select-sm w-125px" onchange="this.form.submit()">
             @foreach([2026, 2025, 2024] as $yr)
                 <option value="{{ $yr }}" {{ $annee == $yr ? 'selected' : '' }}>Année {{ $yr }}</option>
             @endforeach
         </select>
     </form>
-</div>
+@endsection
+
+@section('content')
 
 <!-- Row 1: KPI Cards -->
 <div class="row g-5 g-xl-10 mb-5 mb-xl-10">

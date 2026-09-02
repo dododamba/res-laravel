@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Tableau de bord global')
+@section('page_title', 'Tableau de bord global')
+@section('page_subtitle', 'Vue synoptique de la population, des enquêtes et de la fiscalité territoriale')
 
 @section('content')
 <!--begin::Row - Chiffres Clés-->

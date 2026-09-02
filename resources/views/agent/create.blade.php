@@ -1,20 +1,17 @@
 @extends('layouts.app')
 
 @section('title', 'Enregistrer un nouvel Agent')
+@section('page_title', 'Enregistrer un nouvel Agent Territorial')
+@section('page_subtitle', 'Création d\'une fiche d\'agent municipal et provisionnement automatique de son compte d\'accès')
+
+@section('actions')
+    <a href="{{ route('agent.index') }}" class="btn btn-sm btn-light">
+        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+    </a>
+@endsection
 
 @section('content')
 <div class="card card-flush shadow-sm">
-    <div class="card-header py-5">
-        <div class="card-title d-flex flex-column">
-            <h3 class="fw-bold text-gray-900 mb-1">Enregistrer un nouvel Agent Territorial</h3>
-            <span class="text-muted fs-7">Création d'une fiche d'agent municipal et provisionnement automatique de son compte d'accès</span>
-        </div>
-        <div class="card-toolbar">
-            <a href="{{ route('agent.index') }}" class="btn btn-sm btn-light">
-                <i class="fas fa-arrow-left me-1"></i>Retour à la liste
-            </a>
-        </div>
-    </div>
 
     <div class="card-body">
         <form method="POST" action="{{ route('agent.store') }}" class="form">

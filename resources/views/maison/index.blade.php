@@ -1,24 +1,19 @@
 @extends('layouts.app')
 
 @section('title', 'Fiches des Habitations')
+@section('page_title', 'Fiches des Habitations')
+@section('page_subtitle', 'Registre territorial des parcelles, bâtiments et logements recensés')
+
+@can('create', App\Models\Maison::class)
+    @section('actions')
+        <a href="{{ route('maison.create') }}" class="btn btn-sm btn-primary d-flex align-items-center">
+            {!! $theme->getSvgIcon('duotune/arrows/arr075.svg', 'svg-icon-2 text-white me-2') !!}
+            Saisir une habitation
+        </a>
+    @endsection
+@endcan
 
 @section('content')
-<!--begin::Header Layout-->
-<div class="d-flex align-items-center justify-content-between mb-5">
-    <div>
-        <h1 class="fw-bold text-gray-900 mb-1">Fiches des Habitations</h1>
-        <span class="text-muted fs-7">Registre territorial des parcelles, bâtiments et logements recensés</span>
-    </div>
-    <div>
-        @can('create', App\Models\Maison::class)
-            <a href="{{ route('maison.create') }}" class="btn btn-primary d-flex align-items-center">
-                {!! $theme->getSvgIcon('duotune/arrows/arr075.svg', 'svg-icon-2 text-white me-2') !!}
-                Saisir une habitation
-            </a>
-        @endcan
-    </div>
-</div>
-<!--end::Header Layout-->
 
 <!--begin::Card-->
 <div class="card card-flush shadow-sm">

@@ -1,28 +1,17 @@
 @extends('layouts.app')
 
 @section('title', 'Statistiques Territoriales Hiérarchiques')
+@section('page_title', 'Statistiques Territoriales Hiérarchiques')
+@section('page_subtitle', 'Consolidation dynamique : Global → Quartiers → Carrés → Fiches de collecte')
+
+@section('actions')
+    <span class="badge bg-primary text-white fs-7 fw-bold px-4 py-3 shadow-sm">
+        <i class="bi bi-shield-lock-fill text-white me-2"></i>
+        Périmètre : {{ $globalStats['scope'] === 'global' ? 'Municipal Global' : 'Agent Affecté' }}
+    </span>
+@endsection
 
 @section('content')
-<!--begin::Header Banner-->
-<div class="row g-5 g-xl-10 mb-5 mb-xl-10">
-    <div class="col-12">
-        <div class="card card-flush shadow-sm bg-gradient-primary text-white border-0" style="background: linear-gradient(135deg, #0033A0 0%, #1E40AF 100%);">
-            <div class="card-body p-8 d-flex justify-content-between align-items-center flex-wrap">
-                <div>
-                    <h1 class="text-white fw-bolder fs-2x mb-2">Statistiques Territoriales Hiérarchiques</h1>
-                    <p class="text-white-50 fs-6 mb-0">Consolidation dynamique : Global &rarr; Quartiers &rarr; Carrés &rarr; Fiches de collecte</p>
-                </div>
-                <div class="d-flex align-items-center gap-3">
-                    <span class="badge bg-white text-primary fs-7 fw-bold px-4 py-3 shadow-sm">
-                        <i class="bi bi-shield-lock-fill text-primary me-2"></i>
-                        Périmètre : {{ $globalStats['scope'] === 'global' ? 'Municipal Global' : 'Agent Affecté' }}
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!--end::Header Banner-->
 
 <!--begin::Row - KPI Cards (Niveau 1)-->
 <div class="row g-5 g-xl-10 mb-5 mb-xl-10">

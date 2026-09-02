@@ -1,27 +1,22 @@
 @extends('layouts.app')
 
 @section('title', 'Détails du Quartier : ' . $entity->nom)
+@section('page_title', 'Quartier : ' . $entity->nom)
+@section('page_subtitle', 'Administration territoriale et zonage cartographique')
+
+@section('actions')
+    <a href="{{ route('quartier.index') }}" class="btn btn-light btn-sm me-2">
+        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+    </a>
+    <a href="{{ route('quartier.edit', $entity) }}" class="btn btn-primary btn-sm me-2">
+        <i class="fas fa-pencil-alt me-1"></i>Modifier
+    </a>
+    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
+        <i class="fas fa-trash me-1"></i>Archiver
+    </button>
+@endsection
 
 @section('content')
-<!--begin::Header Layout-->
-<div class="d-flex align-items-center justify-content-between mb-5">
-    <div>
-        <h1 class="fw-bold text-gray-900 mb-1">Quartier : {{ $entity->nom }}</h1>
-        <span class="text-muted fs-7">Administration territoriale et zonage cartographique</span>
-    </div>
-    <div class="d-flex gap-3">
-        <a href="{{ route('quartier.index') }}" class="btn btn-light btn-sm">
-            <i class="fas fa-arrow-left me-1"></i>Retour à la liste
-        </a>
-        <a href="{{ route('quartier.index') }}/{{ $entity->id }}/edit" class="btn btn-primary btn-sm">
-            <i class="fas fa-pencil-alt me-1"></i>Modifier
-        </a>
-        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
-            <i class="fas fa-trash me-1"></i>Archiver
-        </button>
-    </div>
-</div>
-<!--end::Header Layout-->
 
 <!--begin::Delete Confirmation Modal-->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">

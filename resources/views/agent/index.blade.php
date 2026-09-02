@@ -1,21 +1,16 @@
 @extends('layouts.app')
 
 @section('title', 'Gestion des Agents')
+@section('page_title', 'Gestion des Agents Territoriaux')
+@section('page_subtitle', 'Ressources humaines, cartographie et affectations des agents d\'enquêtes')
+
+@section('actions')
+    <a href="{{ route('agent.create') }}" class="btn btn-sm btn-primary d-flex align-items-center">
+        <i class="fas fa-plus me-2"></i>Ajouter un Agent
+    </a>
+@endsection
 
 @section('content')
-<!--begin::Toolbar-->
-<div class="d-flex align-items-center justify-content-between mb-5">
-    <div>
-        <h1 class="fw-bold text-gray-900 mb-1">Gestion des Agents</h1>
-        <span class="text-muted fs-7">Ressources humaines et affectations des agents territoriaux d'enquêtes</span>
-    </div>
-    <div>
-        <a href="{{ route('agent.create') }}" class="btn btn-sm btn-primary">
-            <i class="fas fa-plus me-1"></i>Ajouter un Agent
-        </a>
-    </div>
-</div>
-<!--end::Toolbar-->
 
 <!--begin::Filters-->
 <div class="card card-flush shadow-sm mb-6">

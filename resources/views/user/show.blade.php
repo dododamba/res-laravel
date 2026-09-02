@@ -1,24 +1,19 @@
 @extends('layouts.app')
 
 @section('title', 'Profil de ' . $user->firstname . ' ' . $user->lastname)
+@section('page_title', 'Détails de l\'Utilisateur')
+@section('page_subtitle', 'Fiche d\'habilitation RBAC et audit de sécurité')
+
+@section('actions')
+    <a href="{{ route('user.index') }}" class="btn btn-sm btn-light">
+        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+    </a>
+    <a href="{{ route('user.edit', $user) }}" class="btn btn-sm btn-primary">
+        <i class="fas fa-pencil-alt me-1"></i>Modifier l'Habilitation
+    </a>
+@endsection
 
 @section('content')
-<!--begin::Toolbar-->
-<div class="d-flex align-items-center justify-content-between mb-5">
-    <div>
-        <h1 class="fw-bold text-gray-900 mb-1">Détails de l'Utilisateur</h1>
-        <span class="text-muted fs-7">Fiche d'habilitation RBAC et audit de sécurité</span>
-    </div>
-    <div class="d-flex gap-3">
-        <a href="{{ route('user.index') }}" class="btn btn-sm btn-light">
-            <i class="fas fa-arrow-left me-1"></i>Retour à la liste
-        </a>
-        <a href="{{ route('user.edit', $user) }}" class="btn btn-sm btn-primary">
-            <i class="fas fa-pencil-alt me-1"></i>Modifier l'Habilitation
-        </a>
-    </div>
-</div>
-<!--end::Toolbar-->
 
 <div class="row g-6">
     <!-- Colonne Gauche: Résumé Profil & Agent -->

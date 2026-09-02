@@ -247,53 +247,5 @@
     }
 }
 
-/* ─── APP-SIDEBAR MOBILE (DRAWER) ────────────────────────────────────────────── */
-
-@media (max-width: 991.98px) {
-    /* Par défaut : masqué hors écran à gauche */
-    #kt_app_sidebar {
-        position: fixed !important;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        width: var(--sidebar-width) !important;
-        z-index: 110;
-        transform: translateX(-100%);
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
-        overflow-y: auto;
-    }
-
-    /* Ouvert via classe JS */
-    #kt_app_sidebar.drawer-open {
-        transform: translateX(0) !important;
-    }
-
-    /* Supprimer l'espace réservé au sidebar sur mobile */
-    #kt_app_wrapper {
-        flex-direction: column !important;
-    }
-
-    /* Le contenu principal prend toute la largeur */
-    #kt_app_main {
-        width: 100% !important;
-        min-width: 0 !important;
-    }
-}
-
-@media (min-width: 992px) {
-    /* Desktop : sidebar toujours visible, aucun tiroir */
-    #kt_app_sidebar {
-        transform: none !important;
-        position: relative !important;
-    }
-}
-
-/* ─── TOGGLE SIDEBAR BUTTON ──────────────────────────────────────────────────── */
-
-@media (min-width: 992px) {
-    /* Cacher le bouton hamburger sur desktop */
-    .d-lg-none[title="Afficher la barre latérale"] {
-        display: none !important;
-    }
-}
+/* ─── METRONIC RESPONSIVE UTILITIES ─────────────────────────────────────────── */
+/* Native Metronic 8 handles app-sidebar drawer transitions via style.bundle.css and scripts.bundle.js */

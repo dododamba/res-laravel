@@ -1,23 +1,18 @@
 @extends('layouts.app')
 
 @section('title', "Modifier l'Habitation N°" . $maison->numero_porte)
+@section('page_title', "Modifier l'Habitation : #" . $maison->id)
+@section('page_subtitle', 'Édition des informations d\'habitat et d\'urbanisme')
+
+@section('actions')
+    <a href="{{ route('maison.show', $maison) }}" class="btn btn-sm btn-light">
+        <i class="fas fa-arrow-left me-2"></i>Retour aux détails
+    </a>
+@endsection
 
 @section('content')
 <!--begin::Main form container-->
 <div class="card card-flush shadow-sm">
-    <!--begin::Card Header-->
-    <div class="card-header py-5">
-        <div class="card-title d-flex flex-column">
-            <h3 class="fw-bold text-gray-900 mb-1">Modifier l'Habitation : #{{ $maison->id }}</h3>
-            <span class="text-muted fs-7">Édition des informations d'habitat et d'urbanisme</span>
-        </div>
-        <div class="card-toolbar">
-            <a href="{{ route('maison.show', $maison) }}" class="btn btn-sm btn-light">
-                <i class="fas fa-arrow-left me-2"></i>Retour aux détails
-            </a>
-        </div>
-    </div>
-    <!--end::Card Header-->
 
     <!--begin::Card Body-->
     <div class="card-body">

@@ -1,28 +1,22 @@
 @extends('layouts.app')
 
 @section('title', "Fiche d'Habitation N°" . $maison->numero_porte)
+@section('page_title', "Fiche d'Habitation : #" . $maison->id)
+@section('page_subtitle', 'Saisie terrain et suivi d\'urbanisme')
+
+@section('actions')
+    <a href="{{ route('maison.index') }}" class="btn btn-sm btn-light">
+        <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+    </a>
+    @can('update', $maison)
+        <a href="{{ route('maison.edit', $maison) }}" class="btn btn-sm btn-primary">
+            <i class="fas fa-edit me-2"></i>Modifier la fiche
+        </a>
+    @endcan
+@endsection
 
 @section('content')
 @inject('workflow', 'App\Services\Workflow\MaisonWorkflowService')
-
-<!--begin::Header Layout-->
-<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-5 gap-3">
-    <div>
-        <h1 class="fw-bold text-gray-900 mb-1">Fiche d'Habitation : #{{ $maison->id }}</h1>
-        <span class="text-muted fs-7">Saisie terrain et suivi d'urbanisme</span>
-    </div>
-    <div class="d-flex align-items-center gap-3">
-        <a href="{{ route('maison.index') }}" class="btn btn-light">
-            <i class="fas fa-arrow-left me-2"></i>Retour à la liste
-        </a>
-        @can('update', $maison)
-            <a href="{{ route('maison.edit', $maison) }}" class="btn btn-primary">
-                <i class="fas fa-edit me-2"></i>Modifier la fiche
-            </a>
-        @endcan
-    </div>
-</div>
-<!--end::Header Layout-->
 
 <!--begin::En-tête de Statut & Transitions-->
 <div class="card card-flush shadow-sm mb-6 border-start border-5 border-{{ $maison->statut == \App\Enums\MaisonStatut::VALIDE ? 'success' : ($maison->statut == \App\Enums\MaisonStatut::REJETE ? 'danger' : ($maison->statut == \App\Enums\MaisonStatut::CONTROLE ? 'warning' : 'info')) }}">
