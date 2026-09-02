@@ -3,59 +3,57 @@
 @section('title', 'Recensement des Ménages')
 
 @section('content')
+<!--begin::Header Layout-->
+<div class="d-flex align-items-center justify-content-between mb-5">
+    <div>
+        <h1 class="fw-bold text-gray-900 mb-1">Recensement des Ménages & Familles</h1>
+        <span class="text-muted fs-7">Registre de la population municipale, fiches ménages et statistiques socio-démographiques</span>
+    </div>
+    <div>
+        @can('can', 'RECENSEMENT_CREATE')
+            <a href="{{ route('recensement.create') }}" class="btn btn-primary d-flex align-items-center">
+                {!! $theme->getSvgIcon('duotune/arrows/arr075.svg', 'svg-icon-2 text-white me-2') !!}
+                Nouveau ménage
+            </a>
+        @endcan
+    </div>
+</div>
+<!--end::Header Layout-->
+
 <!--begin::Card-->
 <div class="card card-flush shadow-sm">
     <!--begin::Card Header-->
     <div class="card-header align-items-center py-5 gap-2 gap-md-5">
-        <!--begin::Card Title (Recherche)-->
-        <div class="card-title">
-            <form method="GET" action="{{ route('recensement.index') }}" class="d-flex align-items-center position-relative my-1">
+        <form method="GET" action="{{ route('recensement.index') }}" class="d-flex flex-wrap align-items-center gap-3 w-100 justify-content-between">
+            <div class="d-flex align-items-center position-relative my-1">
                 <span class="svg-icon svg-icon-1 position-absolute ms-4">
                     {!! $theme->getSvgIcon('duotune/general/gen021.svg', 'svg-icon-2') !!}
                 </span>
-                <input type="text" name="q" value="{{ request('q') }}" class="form-control form-control-solid w-250px w-sm-auto ps-14" placeholder="Rechercher un chef..." />
-                @if(request('quartier_id'))
-                    <input type="hidden" name="quartier_id" value="{{ request('quartier_id') }}" />
-                @endif
-                @if(request('statut'))
-                    <input type="hidden" name="statut" value="{{ request('statut') }}" />
-                @endif
-            </form>
-        </div>
-        <!--end::Card Title-->
+                <input type="text" name="q" value="{{ request('q') }}" class="form-control form-control-solid w-250px ps-14" placeholder="Rechercher un chef..." />
+            </div>
 
-        <!--begin::Card Toolbar (Filtres et Création)-->
-        <div class="card-toolbar d-flex flex-wrap gap-2">
-            <!--Filtres-->
-            <form method="GET" action="{{ route('recensement.index') }}" class="d-flex flex-wrap align-items-center gap-2">
-                @if(request('q'))
-                    <input type="hidden" name="q" value="{{ request('q') }}" />
-                @endif
-                
-                <select name="quartier_id" class="form-select form-select-solid" onchange="this.form.submit()">
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <select name="quartier_id" class="form-select form-select-solid w-180px" onchange="this.form.submit()">
                     <option value="">Tous les quartiers</option>
                     @foreach($quartiers as $q)
                         <option value="{{ $q->id }}" {{ request('quartier_id') == $q->id ? 'selected' : '' }}>{{ $q->nom }}</option>
                     @endforeach
                 </select>
 
-                <select name="statut" class="form-select form-select-solid" onchange="this.form.submit()">
+                <select name="statut" class="form-select form-select-solid w-180px" onchange="this.form.submit()">
                     <option value="">Tous les statuts</option>
                     @foreach(\App\Enums\RecensementStatut::cases() as $status)
                         <option value="{{ $status->value }}" {{ request('statut') == $status->value ? 'selected' : '' }}>{{ $status->label() }}</option>
                     @endforeach
                 </select>
-            </form>
 
-            @can('can', 'RECENSEMENT_CREATE')
-                <!--Bouton Nouveau-->
-                <a href="{{ route('recensement.create') }}" class="btn btn-primary d-flex align-items-center">
-                    {!! $theme->getSvgIcon('duotune/arrows/arr075.svg', 'svg-icon-2 text-white me-2') !!}
-                    Nouveau ménage
-                </a>
-            @endcan
-        </div>
-        <!--end::Card Toolbar-->
+                @if(request()->anyFilled(['q', 'quartier_id', 'statut']))
+                    <a href="{{ route('recensement.index') }}" class="btn btn-sm btn-light-danger me-2" title="Réinitialiser">
+                        <i class="fas fa-undo me-1"></i>Effacer
+                    </a>
+                @endif
+            </div>
+        </form>
     </div>
     <!--end::Card Header-->
 

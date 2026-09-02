@@ -6,8 +6,16 @@
 <!--begin::Toolbar-->
 <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-5">
     <div>
-        <h1 class="fw-bold text-gray-900 mb-1">Comptes Utilisateurs</h1>
-        <span class="text-muted fs-7">Gestion des habilitations RBAC et des accès système</span>
+        <h1 class="fw-bold text-gray-900 mb-1">Comptes Utilisateurs & Habilitations</h1>
+        <span class="text-muted fs-7">Gestion des rôles RBAC, droits d'accès et comptes des opérateurs municipaux</span>
+    </div>
+    <div>
+        @can('can', 'USER_CREATE')
+            <a href="{{ route('user.create') }}" class="btn btn-primary d-flex align-items-center">
+                {!! $theme->getSvgIcon('duotune/arrows/arr075.svg', 'svg-icon-2 text-white me-2') !!}
+                Nouveau compte
+            </a>
+        @endcan
     </div>
 </div>
 <!--end::Toolbar-->

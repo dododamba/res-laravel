@@ -10,8 +10,8 @@
         <span class="text-muted fs-7">Zonage urbain par blocs et îlots administratifs (Nomenclatures)</span>
     </div>
     <div>
-        <a href="{{ route('carre.create') }}" class="btn btn-primary btn-sm">
-            <i class="fas fa-plus me-1"></i>Nouveau Carré
+        <a href="{{ route('carre.create') }}" class="btn btn-primary d-flex align-items-center">
+            <i class="fas fa-plus me-2"></i>Nouveau Carré
         </a>
     </div>
 </div>
@@ -62,11 +62,11 @@
                     @forelse($entities as $entity)
                         <tr>
                             <td>
-                                <span class="text-gray-400 fs-8">{{ loop->iteration }}</span>
+                                <span class="text-gray-400 fs-8">{{ $loop->iteration }}</span>
                             </td>
                             <td>
                                 <div class="d-flex flex-column">
-                                    <a href="{{ route('carre.index') }}/{{ $entity->id }}" class="text-gray-900 text-hover-primary fs-5 fw-bold mb-1">
+                                    <a href="{{ route('carre.show', $entity) }}" class="text-gray-900 text-hover-primary fs-5 fw-bold mb-1">
                                         {{ $entity->nom }}
                                     </a>
                                     <span class="text-muted fs-8 font-monospace">Code : {{ $entity->code ?? 'N/A' }}</span>
@@ -74,7 +74,7 @@
                             </td>
                             <td>
                                 @if($entity->quartier)
-                                    <a href="{{ route('quartier.index') }}/{{ $entity->quartier->id }}" class="text-gray-800 text-hover-primary fw-bold fs-6">
+                                    <a href="{{ route('quartier.show', $entity->quartier) }}" class="text-gray-800 text-hover-primary fw-bold fs-6">
                                         <i class="fas fa-map-marked-alt text-muted me-1"></i>{{ $entity->quartier->nom }}
                                     </a>
                                 @else
@@ -101,10 +101,10 @@
                             </td>
                             <td class="text-end">
                                 <div class="d-flex justify-content-end gap-2">
-                                    <a href="{{ route('carre.index') }}/{{ $entity->id }}" class="btn btn-icon btn-light btn-active-color-primary btn-sm" title="Détails">
+                                    <a href="{{ route('carre.show', $entity) }}" class="btn btn-icon btn-light btn-active-color-primary btn-sm" title="Détails">
                                         <i class="fas fa-eye fs-6"></i>
                                     </a>
-                                    <a href="{{ route('carre.index') }}/{{ $entity->id }}/edit" class="btn btn-icon btn-light btn-active-color-primary btn-sm" title="Modifier">
+                                    <a href="{{ route('carre.edit', $entity) }}" class="btn btn-icon btn-light btn-active-color-warning btn-sm" title="Modifier">
                                         <i class="fas fa-pencil-alt fs-6"></i>
                                     </a>
                                     <button class="btn btn-icon btn-light-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $entity->id }}" title="Archiver">

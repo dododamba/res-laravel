@@ -77,6 +77,32 @@
                                     </div>
                                 @endif
 
+                                @if(session('warning'))
+                                    <div class="alert alert-dismissible bg-light-warning d-flex align-items-center p-5 mb-5 border border-warning border-dashed rounded">
+                                        <i class="fas fa-exclamation-circle fs-2hx text-warning me-4"></i>
+                                        <div class="d-flex flex-column">
+                                            <h4 class="fw-bold text-gray-900 mb-1 fs-6">Avertissement</h4>
+                                            <span class="text-gray-700 fw-semibold">{!! session('warning') !!}</span>
+                                        </div>
+                                        <button type="button" class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto" data-bs-dismiss="alert">
+                                            <i class="fas fa-times text-warning fs-3"></i>
+                                        </button>
+                                    </div>
+                                @endif
+
+                                @if(session('info'))
+                                    <div class="alert alert-dismissible bg-light-info d-flex align-items-center p-5 mb-5 border border-info border-dashed rounded">
+                                        <i class="fas fa-info-circle fs-2hx text-info me-4"></i>
+                                        <div class="d-flex flex-column">
+                                            <h4 class="fw-bold text-gray-900 mb-1 fs-6">Information</h4>
+                                            <span class="text-gray-700 fw-semibold">{!! session('info') !!}</span>
+                                        </div>
+                                        <button type="button" class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto" data-bs-dismiss="alert">
+                                            <i class="fas fa-times text-info fs-3"></i>
+                                        </button>
+                                    </div>
+                                @endif
+
                                 <!-- Injection du contenu principal de la page -->
                                 @yield('content')
 

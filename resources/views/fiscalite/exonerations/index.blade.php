@@ -3,17 +3,26 @@
 @section('title', 'Gestion des Exonérations Fiscales')
 
 @section('content')
+<!--begin::Header Layout-->
+<div class="d-flex align-items-center justify-content-between mb-5">
+    <div>
+        <h1 class="fw-bold text-gray-900 mb-1">Gestion des Exonérations Fiscales</h1>
+        <span class="text-muted fs-7">Registre des dégrèvements, avis d'exonération et arrêtés d'exemption municipale</span>
+    </div>
+    <div>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal_exoneration">
+            {!! $theme->getSvgIcon('duotune/arrows/arr075.svg', 'svg-icon-2 text-white me-1') !!}
+            Accorder une Exonération
+        </button>
+    </div>
+</div>
+<!--end::Header Layout-->
+
 <div class="row g-5 g-xl-10">
-    <div class="col-xl-8">
+    <div class="col-12">
         <div class="card card-flush shadow-sm">
             <div class="card-header align-items-center py-5">
                 <h3 class="card-title fw-bold text-gray-900">Avis d'Exonération et Dégrèvements Accordés</h3>
-                <div class="card-toolbar">
-                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modal_exoneration">
-                        {!! $theme->getSvgIcon('duotune/arrows/arr075.svg', 'svg-icon-2 text-white me-1') !!}
-                        Accorder une Exonération
-                    </button>
-                </div>
             </div>
 
             <div class="card-body pt-0">

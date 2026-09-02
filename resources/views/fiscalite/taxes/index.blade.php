@@ -3,33 +3,50 @@
 @section('title', 'Taxes Municipales')
 
 @section('content')
+<!--begin::Header Layout-->
+<div class="d-flex align-items-center justify-content-between mb-5">
+    <div>
+        <h1 class="fw-bold text-gray-900 mb-1">Nomenclature des Taxes Municipales</h1>
+        <span class="text-muted fs-7">Barème officiel, modes de calcul et arrêtés tarifaires communaux</span>
+    </div>
+    <div>
+        <a href="{{ route('taxes.create') }}" class="btn btn-primary d-flex align-items-center">
+            {!! $theme->getSvgIcon('duotune/arrows/arr075.svg', 'svg-icon-2 text-white me-2') !!}
+            Nouvelle Taxe Municipale
+        </a>
+    </div>
+</div>
+<!--end::Header Layout-->
+
+<!--begin::Card-->
 <div class="card card-flush shadow-sm">
+    <!--begin::Card Header-->
     <div class="card-header align-items-center py-5 gap-2 gap-md-5">
-        <div class="card-title">
-            <form method="GET" action="{{ route('taxes.index') }}" class="d-flex align-items-center position-relative my-1">
+        <form method="GET" action="{{ route('taxes.index') }}" class="d-flex flex-wrap align-items-center gap-3 w-100 justify-content-between">
+            <div class="d-flex align-items-center position-relative my-1">
                 <span class="svg-icon svg-icon-1 position-absolute ms-4">
                     {!! $theme->getSvgIcon('duotune/general/gen021.svg', 'svg-icon-2') !!}
                 </span>
                 <input type="text" name="q" value="{{ request('q') }}" class="form-control form-control-solid w-250px ps-14" placeholder="Rechercher une taxe..." />
-            </form>
-        </div>
+            </div>
 
-        <div class="card-toolbar d-flex flex-stack gap-3">
-            <form method="GET" action="{{ route('taxes.index') }}" class="d-flex align-items-center gap-2">
-                <select name="categorie" class="form-select form-select-solid w-180px" onchange="this.form.submit()">
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <select name="categorie" class="form-select form-select-solid w-200px" onchange="this.form.submit()">
                     <option value="">Toutes les catégories</option>
                     @foreach($categories as $cat)
                         <option value="{{ $cat }}" {{ request('categorie') == $cat ? 'selected' : '' }}>{{ $cat }}</option>
                     @endforeach
                 </select>
-            </form>
 
-            <a href="{{ route('taxes.create') }}" class="btn btn-primary d-flex align-items-center">
-                {!! $theme->getSvgIcon('duotune/arrows/arr075.svg', 'svg-icon-2 text-white me-2') !!}
-                Nouvelle Taxe Municipale
-            </a>
-        </div>
+                @if(request()->anyFilled(['q', 'categorie']))
+                    <a href="{{ route('taxes.index') }}" class="btn btn-sm btn-light-danger me-2" title="Réinitialiser">
+                        <i class="fas fa-undo me-1"></i>Effacer
+                    </a>
+                @endif
+            </div>
+        </form>
     </div>
+    <!--end::Card Header-->
 
     <div class="card-body pt-0">
         <div class="table-responsive">

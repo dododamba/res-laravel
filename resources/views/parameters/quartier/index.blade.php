@@ -10,8 +10,8 @@
         <span class="text-muted fs-7">Zonage et administration territoriale (Nomenclatures)</span>
     </div>
     <div>
-        <a href="{{ route('quartier.create') }}" class="btn btn-primary btn-sm">
-            <i class="fas fa-plus me-1"></i>Nouveau Quartier
+        <a href="{{ route('quartier.create') }}" class="btn btn-primary d-flex align-items-center">
+            <i class="fas fa-plus me-2"></i>Nouveau Quartier
         </a>
     </div>
 </div>
@@ -129,11 +129,11 @@
                     @forelse($entities as $entity)
                         <tr>
                             <td>
-                                <span class="text-gray-400 fs-8">{{ loop->iteration }}</span>
+                                <span class="text-gray-400 fs-8">{{ $loop->iteration }}</span>
                             </td>
                             <td>
                                 <div class="d-flex flex-column">
-                                    <a href="{{ route('quartier.index') }}/{{ $entity->id }}" class="text-gray-900 text-hover-primary fs-5 fw-bold mb-1">
+                                    <a href="{{ route('quartier.show', $entity) }}" class="text-gray-900 text-hover-primary fs-5 fw-bold mb-1">
                                         {{ $entity->nom }}
                                     </a>
                                     <span class="text-muted fs-8">Code : {{ $entity->code ?? 'N/A' }}</span>
@@ -171,10 +171,10 @@
                             </td>
                             <td class="text-end">
                                 <div class="d-flex justify-content-end gap-2">
-                                    <a href="{{ route('quartier.index') }}/{{ $entity->id }}" class="btn btn-icon btn-light btn-active-color-primary btn-sm" title="Détails">
+                                    <a href="{{ route('quartier.show', $entity) }}" class="btn btn-icon btn-light btn-active-color-primary btn-sm" title="Détails">
                                         <i class="fas fa-eye fs-6"></i>
                                     </a>
-                                    <a href="{{ route('quartier.index') }}/{{ $entity->id }}/edit" class="btn btn-icon btn-light btn-active-color-primary btn-sm" title="Modifier">
+                                    <a href="{{ route('quartier.edit', $entity) }}" class="btn btn-icon btn-light btn-active-color-warning btn-sm" title="Modifier">
                                         <i class="fas fa-pencil-alt fs-6"></i>
                                     </a>
                                     <button class="btn btn-icon btn-light-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $entity->id }}" title="Archiver">

@@ -3,20 +3,35 @@
 @section('title', 'Journal des Paiements & Encaissements')
 
 @section('content')
+<!--begin::Header Layout-->
+<div class="d-flex align-items-center justify-content-between mb-5">
+    <div>
+        <h1 class="fw-bold text-gray-900 mb-1">Journal des Paiements & Encaissements</h1>
+        <span class="text-muted fs-7">Historique certifié des quittances, reçus d'encaissement et règlements fiscaux</span>
+    </div>
+    <div>
+        <a href="{{ route('paiements.create') }}" class="btn btn-primary d-flex align-items-center">
+            {!! $theme->getSvgIcon('duotune/arrows/arr075.svg', 'svg-icon-2 text-white me-2') !!}
+            Nouvel Encaissement
+        </a>
+    </div>
+</div>
+<!--end::Header Layout-->
+
+<!--begin::Card-->
 <div class="card card-flush shadow-sm">
+    <!--begin::Card Header-->
     <div class="card-header align-items-center py-5 gap-2 gap-md-5">
-        <div class="card-title">
-            <form method="GET" action="{{ route('paiements.index') }}" class="d-flex align-items-center position-relative my-1">
+        <form method="GET" action="{{ route('paiements.index') }}" class="d-flex flex-wrap align-items-center gap-3 w-100 justify-content-between">
+            <div class="d-flex align-items-center position-relative my-1">
                 <span class="svg-icon svg-icon-1 position-absolute ms-4">
                     {!! $theme->getSvgIcon('duotune/general/gen021.svg', 'svg-icon-2') !!}
                 </span>
                 <input type="text" name="q" value="{{ request('q') }}" class="form-control form-control-solid w-250px ps-14" placeholder="N° Reçu, Référence, Opérateur..." />
-            </form>
-        </div>
+            </div>
 
-        <div class="card-toolbar d-flex flex-wrap align-items-center gap-3">
-            <form method="GET" action="{{ route('paiements.index') }}" class="d-flex flex-wrap align-items-center gap-2">
-                <select name="annee" class="form-select form-select-solid w-120px" onchange="this.form.submit()">
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <select name="annee" class="form-select form-select-solid w-130px" onchange="this.form.submit()">
                     <option value="">Toutes années</option>
                     @foreach([2026, 2025, 2024] as $yr)
                         <option value="{{ $yr }}" {{ request('annee', date('Y')) == $yr ? 'selected' : '' }}>{{ $yr }}</option>
@@ -43,14 +58,16 @@
                         <option value="{{ $mode->value }}" {{ request('mode_paiement') == $mode->value ? 'selected' : '' }}>{{ $mode->value }}</option>
                     @endforeach
                 </select>
-            </form>
 
-            <a href="{{ route('paiements.create') }}" class="btn btn-primary d-flex align-items-center">
-                {!! $theme->getSvgIcon('duotune/arrows/arr075.svg', 'svg-icon-2 text-white me-2') !!}
-                Nouvel Encaissement
-            </a>
-        </div>
+                @if(request()->anyFilled(['q', 'taxe_id', 'quartier_id', 'mode_paiement']) || (request('annee') && request('annee') != date('Y')))
+                    <a href="{{ route('paiements.index') }}" class="btn btn-sm btn-light-danger me-2" title="Réinitialiser">
+                        <i class="fas fa-undo me-1"></i>Effacer
+                    </a>
+                @endif
+            </div>
+        </form>
     </div>
+    <!--end::Card Header-->
 
     <div class="card-body pt-0">
         <div class="table-responsive">

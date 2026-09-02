@@ -10,8 +10,8 @@
         <span class="text-muted fs-7">Gestion des nomenclatures et paramètres de référence</span>
     </div>
     <div>
-        <a href="{{ route($routePrefix . '.create') }}" class="btn btn-primary btn-sm">
-            <i class="fas fa-plus me-1"></i>Nouveau
+        <a href="{{ route($routePrefix . '.create') }}" class="btn btn-primary d-flex align-items-center">
+            <i class="fas fa-plus me-2"></i>Nouveau
         </a>
     </div>
 </div>
